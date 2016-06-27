@@ -1,5 +1,7 @@
 # Using reinforcement learning to train an autonomous remote control car
 
+**NOTE:** This is currently very much a work in progress. For a more complete, runnable reinforcement learning project with Python, see my other project that this relies on...
+
 This project is heavily reliant on the work done in my other RL project, which can be found here: https://github.com/harvitronix/reinforcement-learning-car
 
 Think of this project as an extension of that one.
