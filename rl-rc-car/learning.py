@@ -51,24 +51,26 @@ if __name__ == "__main__":
         distance += 1
         action = pb.get_action(state)
 
-        reward, new_state = game_state.frame_step(action)
+        for x in range(repeat_action):
+            reward, new_state = game_state.frame_step(action)
 
+        if enable_training:
+            pb.step(state, action, reward, new_state, False)
+
+        # Mimi terminal for reporting.
         if reward == -500:
             # Give us some info.
-            print(distance)
             distances.append(distance)
-            if len(distances) > 5:
+            if len(distances) > 25:
                 distances.pop(0)
+            print("%d - Average distance: %.2f" % (i, mean(distances)))
+            results.append(mean(distances))
             distance = 0
-
-        pb.step(state, action, reward, new_state, False)
 
         state = new_state
 
         if i % 100 == 0 and i > 0:
             print("Epsilon: %.5f" % pb.epsilon)
-            print("%d - Average distance: %.2f" % (i, mean(distances)))
-            results.append(mean(distances))
 
     for r in results:
         print(r)
