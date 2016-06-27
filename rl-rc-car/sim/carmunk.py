@@ -87,9 +87,25 @@ class GameState:
         self.space.add(self.car_body, self.car_shape)
 
     def frame_step(self, action):
-        if action == 0:  # Turn right.
+        """
+        Actions are:
+        0: right, forward
+        1: left, forward
+        2: straight, forward
+        3: right, back
+        4: left, back
+        5: straight, back
+        """
+        # Forward or back.
+        if 0 <= action <= 2:
+            velocity_m = 100
+        else:
+            velocity_m = -100
+
+        # Turning.
+        if action == 0 or action == 3:  # Turn right.
             self.car_body.angle -= .2
-        elif action == 1:  # Turn left.
+        elif action == 1 or action == 4:  # Turn left.
             self.car_body.angle += .2
 
         # Move obstacles.
@@ -97,7 +113,7 @@ class GameState:
             self.move_obstacles()
 
         driving_direction = Vec2d(1, 0).rotated(self.car_body.angle)
-        self.car_body.velocity = 100 * driving_direction
+        self.car_body.velocity = velocity_m * driving_direction
 
         # Update the screen and stuff.
         screen.fill(THECOLORS["black"])
@@ -113,13 +129,16 @@ class GameState:
         state = np.array([readings])
 
         # Set the reward.
-        # Car crashed when any reading == 1
         if self.car_is_crashed(readings):
             self.crashed = True
             reward = -500
         else:
-            # Higher readings are better, so return the sum.
-            reward = -5 + int(self.sum_readings(readings) / 10)
+            if velocity_m < 0:
+                # If we're going backwards, give negative reward.
+                reward = -1
+            else:
+                # Higher readings are better, so return the sum.
+                reward = -5 + int(self.sum_readings(readings) / 10)
         self.num_steps += 1
 
         return reward, state
