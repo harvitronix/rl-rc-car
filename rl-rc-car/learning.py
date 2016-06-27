@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
     # Just change these.
     train_or_show = 'train'
-    weights_file = ''
+    weights_file = 'saved-models/testing.h5'
 
     if train_or_show == 'train':
         enable_training = True
@@ -29,7 +29,8 @@ if __name__ == "__main__":
     pb = becho.ProjectBecho(network, frames=frames, num_actions=actions,
                             batch_size=32, min_epsilon=0.1, num_inputs=inputs,
                             replay_size=1000000, gamma=0.99, verbose=True,
-                            enable_training=enable_training)
+                            enable_training=enable_training,
+                            save_steps=500)
 
     rewards = []
     results = []
@@ -43,23 +44,24 @@ if __name__ == "__main__":
 
     distance = 0
 
+    _, state = game_state.frame_step((2))
+
     for i in range(frames):
-        _, state = game_state.frame_step((2))
 
         distance += 1
         action = pb.get_action(state)
 
         reward, new_state = game_state.frame_step(action)
 
-        pb.step(state, action, reward, new_state, False)
-
         if reward == -500:
             # Give us some info.
             print(distance)
             distances.append(distance)
-            if len(distances) > 100:
+            if len(distances) > 5:
                 distances.pop(0)
             distance = 0
+
+        pb.step(state, action, reward, new_state, False)
 
         state = new_state
 
