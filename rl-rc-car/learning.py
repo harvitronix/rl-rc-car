@@ -1,6 +1,7 @@
 from becho import becho, bechonet
 from sim import carmunk
 from statistics import mean
+import matplotlib.pyplot as plt
 
 
 if __name__ == "__main__":
@@ -22,13 +23,13 @@ if __name__ == "__main__":
         save_weights = False
 
     network = bechonet.BechoNet(num_actions=actions, num_inputs=inputs,
-                                nodes_1=256, nodes_2=256, verbose=True,
+                                nodes_1=512, nodes_2=512, verbose=True,
                                 load_weights=load_weights,
                                 weights_file=weights_file,
                                 save_weights=save_weights)
     pb = becho.ProjectBecho(network, frames=frames, num_actions=actions,
-                            batch_size=32, min_epsilon=0.1, num_inputs=inputs,
-                            replay_size=100000, gamma=0.99, verbose=True,
+                            batch_size=50, min_epsilon=0.1, num_inputs=inputs,
+                            replay_size=50000, gamma=0.99, verbose=True,
                             enable_training=enable_training,
                             save_steps=500)
 
@@ -68,5 +69,10 @@ if __name__ == "__main__":
             print("%d - Average distance: %.2f" % (i, mean(distances)))
             print("Epsilon: %.5f" % pb.epsilon)
 
-    for r in results:
-        print(r)
+    # Plot the average distance.
+    # plt.plot(results)
+    # plt.show()
+
+    # Plot the loss.
+    plt.plot(network.loss_log)
+    plt.show()

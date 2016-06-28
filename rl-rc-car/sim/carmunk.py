@@ -36,7 +36,7 @@ class GameState:
         # Record steps.
         self.num_steps = 0
 
-        # Create walls.
+        # Create outer walls.
         static = [
             pymunk.Segment(
                 self.space.static_body,
@@ -58,27 +58,49 @@ class GameState:
             s.color = THECOLORS['red']
         self.space.add(static)
 
-        # Create some obstacles, semi-randomly.
-        # We'll create three and they'll move around to prevent over-fitting.
-        self.obstacles = []
-        self.obstacles.append(self.create_obstacle(200, 350, 100))
-        self.obstacles.append(self.create_obstacle(700, 200, 125))
-        self.obstacles.append(self.create_obstacle(600, 600, 35))
+        # Try to create rooms and halls.
+        layout1 = [
+            pymunk.Segment(
+                self.space.static_body,
+                (0, 245), (0, 325), 400),
+            pymunk.Segment(
+                self.space.static_body,
+                (325, 450), (325, 650), 50),
+            pymunk.Segment(
+                self.space.static_body,
+                (600, 200), (600, 650), 50),
+            pymunk.Segment(
+                self.space.static_body,
+                (1100, 400), (1100, 450), 300),
+            pymunk.Segment(
+                self.space.static_body,
+                (900, 0), (900, 200), 50),
+        ]
+        for s in layout1:
+            s.friction = 1.
+            s.group = 1
+            s.collision_type = 1
+            s.color = THECOLORS['blue']
+        self.space.add(layout1)
 
-    def create_obstacle(self, x, y, r):
-        c_body = pymunk.Body(pymunk.inf, pymunk.inf)
-        c_shape = pymunk.Circle(c_body, r)
-        c_shape.elasticity = 1.0
-        c_body.position = x, y
-        c_shape.color = THECOLORS["blue"]
-        self.space.add(c_body, c_shape)
-        return c_body
+        # Create a cat.
+        self.create_cat()
+
+    def create_cat(self):
+        inertia = pymunk.moment_for_circle(1, 0, 14, (0, 0))
+        self.cat_body = pymunk.Body(1, inertia)
+        self.cat_body.position = 800, 200
+        self.cat_shape = pymunk.Circle(self.cat_body, 30)
+        self.cat_shape.color = THECOLORS["orange"]
+        self.car_shape.elasticity = 1.0
+        self.cat_shape.angle = 0.5
+        self.space.add(self.cat_body, self.cat_shape)
 
     def create_car(self, x, y, r):
         inertia = pymunk.moment_for_circle(1, 0, 14, (0, 0))
         self.car_body = pymunk.Body(1, inertia)
         self.car_body.position = x, y
-        self.car_shape = pymunk.Circle(self.car_body, 25)
+        self.car_shape = pymunk.Circle(self.car_body, 15)
         self.car_shape.color = THECOLORS["green"]
         self.car_shape.elasticity = 1.0
         self.car_body.angle = r
@@ -87,6 +109,10 @@ class GameState:
         self.space.add(self.car_body, self.car_shape)
 
     def frame_step(self, action):
+        # Move cat.
+        if self.num_steps % 5 == 0:
+            self.move_cat()
+
         """
         Actions are:
         0: right, forward
@@ -98,19 +124,15 @@ class GameState:
         """
         # Forward or back.
         if 0 <= action <= 2:
-            velocity_m = 100
+            velocity_m = 50
         else:
-            velocity_m = -100
+            velocity_m = -50
 
         # Turning.
         if action == 0 or action == 3:  # Turn right.
             self.car_body.angle -= .2
         elif action == 1 or action == 4:  # Turn left.
             self.car_body.angle += .2
-
-        # Move obstacles.
-        if self.num_steps % 100 == 0:
-            self.move_obstacles()
 
         driving_direction = Vec2d(1, 0).rotated(self.car_body.angle)
         self.car_body.velocity = velocity_m * driving_direction
@@ -143,14 +165,11 @@ class GameState:
 
         return reward, state
 
-    def move_obstacles(self):
-        # Randomly move obstacles around.
-        for obstacle in self.obstacles:
-            speed = random.randint(1, 5)
-            direction = Vec2d(1, 0).rotated(
-                self.car_body.angle + random.randint(-2, 2)
-            )
-            obstacle.velocity = speed * direction
+    def move_cat(self):
+        speed = random.randint(0, 80)
+        self.cat_body.angle -= random.randint(-1, 1)
+        direction = Vec2d(1, 0).rotated(self.cat_body.angle)
+        self.cat_body.velocity = speed * direction
 
     def car_is_crashed(self, readings):
         for reading in readings:
@@ -219,8 +238,8 @@ class GameState:
         return i
 
     def make_sonar_arm(self, x, y):
-        spread = 10  # Default spread.
-        distance = 20  # Gap before first sensor.
+        spread = 5  # Default spread.
+        distance = 10  # Gap before first sensor.
         arm_points = []
         # Make an arm. We build it flat because we'll rotate it about the
         # center later.
