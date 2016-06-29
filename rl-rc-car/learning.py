@@ -2,6 +2,7 @@ from becho import becho, bechonet
 from sim import carmunk
 from statistics import mean
 import matplotlib.pyplot as plt
+import sys
 
 
 if __name__ == "__main__":
@@ -54,7 +55,7 @@ if __name__ == "__main__":
         if enable_training:
             pb.step(state, action, reward, new_state, False)
 
-        # Mimi terminal for reporting.
+        # Mimic terminal for reporting.
         if reward == -500:
             # Give us some info.
             distances.append(distance)
@@ -65,7 +66,7 @@ if __name__ == "__main__":
 
         state = new_state
 
-        if i % 100 == 0 and i > 0:
+        if i % 100 == 0 and i > 0 and len(distances) > 0:
             print("%d - Average distance: %.2f" % (i, mean(distances)))
             print("Epsilon: %.5f" % pb.epsilon)
 

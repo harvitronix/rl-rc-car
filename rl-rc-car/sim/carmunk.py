@@ -58,6 +58,7 @@ class GameState:
             s.color = THECOLORS['red']
         self.space.add(static)
 
+        """
         # Try to create rooms and halls.
         layout1 = [
             pymunk.Segment(
@@ -82,6 +83,7 @@ class GameState:
             s.collision_type = 1
             s.color = THECOLORS['blue']
         self.space.add(layout1)
+        """
 
         # Create a cat.
         self.create_cat()
@@ -152,7 +154,7 @@ class GameState:
 
         # Set the reward.
         if self.car_is_crashed(readings):
-            self.crashed = True
+            print("Crashed")
             reward = -500
         else:
             if velocity_m < 0:
@@ -238,8 +240,8 @@ class GameState:
         return i
 
     def make_sonar_arm(self, x, y):
-        spread = 5  # Default spread.
-        distance = 10  # Gap before first sensor.
+        spread = 8  # Default spread.
+        distance = 18  # Gap before first sensor.
         arm_points = []
         # Make an arm. We build it flat because we'll rotate it about the
         # center later.
