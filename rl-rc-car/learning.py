@@ -1,13 +1,12 @@
 from becho import becho, bechonet
 from sim import carmunk
 from statistics import mean
-import matplotlib.pyplot as plt
-import sys
+import csv
 
 
 if __name__ == "__main__":
     frames = 20000
-    inputs = 3
+    inputs = 4
     actions = 6
 
     # Just change these.
@@ -70,10 +69,10 @@ if __name__ == "__main__":
             print("%d - Average distance: %.2f" % (i, mean(distances)))
             print("Epsilon: %.5f" % pb.epsilon)
 
-    # Plot the average distance.
-    # plt.plot(results)
-    # plt.show()
-
-    # Plot the loss.
-    plt.plot(network.loss_log)
-    plt.show()
+    # Save stuff.
+    with open('results/loss-log.csv', 'w') as myfile:
+        wr = csv.writer(myfile)
+        wr.writerow(network.loss_log)
+    with open('results/distances.csv', 'w') as myfile:
+        wr = csv.writer(myfile)
+        wr.writerow(results)

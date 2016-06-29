@@ -143,6 +143,12 @@ class GameState:
         # Get the current location and the readings there.
         x, y = self.car_body.position
         readings = self.get_sonar_readings(x, y, self.car_body.angle)
+
+        # Add the direction to the state.
+        direction = 1 if velocity_m == 5 else 0
+        readings.append(direction)
+
+        # Numpy it.
         state = np.array([readings])
 
         # Set the reward.
