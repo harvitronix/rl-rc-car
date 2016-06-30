@@ -25,7 +25,10 @@ draw_screen = True
 
 
 class GameState:
-    def __init__(self):
+    def __init__(self, noisey=False):
+        # Noisey sensors?
+        self.noisey = noisey
+
         # Physics stuff.
         self.space = pymunk.Space()
         self.space.gravity = pymunk.Vec2d(0., 0.)
@@ -178,14 +181,14 @@ class GameState:
             obstacle.velocity = speed * direction
 
     def move_cat(self):
-        speed = random.randint(0, 80)
+        speed = random.randint(50, 120)
         self.cat_body.angle -= random.randint(-1, 1)
         direction = Vec2d(1, 0).rotated(self.cat_body.angle)
         self.cat_body.velocity = speed * direction
 
     def car_is_crashed(self, readings):
         for reading in readings:
-            if reading < 1:
+            if reading < 2:
                 return True
         return False
 
@@ -215,10 +218,28 @@ class GameState:
         readings.append(self.get_arm_distance(arm_middle, x, y, angle, 0))
         readings.append(self.get_arm_distance(arm_right, x, y, angle, -0.75))
 
+        if self.noisey:
+            readings = self.make_sonar_noise(readings)
+
         if show_sensors:
             pygame.display.update()
 
         return readings
+
+    def make_sonar_noise(self, readings):
+        """
+        This attemts to mimic noisey sensors. Because sonar is noisey.
+
+        70% of the time, just return a random reading.
+        """
+        new_readings = []
+        if random.randint(0, 10) > 7:
+            for r in readings:
+                new_readings.append(random.randint(0, 39))
+        else:
+            new_readings = readings
+
+        return new_readings
 
     def get_arm_distance(self, arm, x, y, angle, offset):
         # Used to count the distance.

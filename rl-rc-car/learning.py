@@ -3,13 +3,13 @@ from sim import carmunk
 from statistics import mean
 import csv
 
-frames = 20000
+frames = 10000
 inputs = 4
 actions = 6
 
 # Just change these.
-train_or_show = 'train'
-weights_file = 'saved-models/testing.h5'
+train_or_show = 'laskdjf'
+weights_file = 'saved-models/testing-9000.h5'
 
 if train_or_show == 'train':
     enable_training = True
@@ -26,7 +26,7 @@ network = bechonet.BechoNet(num_actions=actions, num_inputs=inputs,
                             weights_file=weights_file,
                             save_weights=save_weights)
 pb = becho.ProjectBecho(network, frames=frames, num_actions=actions,
-                        batch_size=100, min_epsilon=0.1, num_inputs=inputs,
+                        batch_size=32, min_epsilon=0.1, num_inputs=inputs,
                         replay_size=100000, gamma=0.9, verbose=True,
                         enable_training=enable_training,
                         save_steps=1000)
@@ -38,7 +38,7 @@ distance = 0
 
 repeat_action = 2
 
-game_state = carmunk.GameState()
+game_state = carmunk.GameState(noisey=True)
 _, state = game_state.frame_step((2))
 
 for i in range(frames):
@@ -54,6 +54,7 @@ for i in range(frames):
 
     # Mimic terminal for reporting.
     if reward == -500:
+        print("Crashed %d." % i)
         # Give us some info.
         distances.append(distance)
         if len(distances) > 25:
@@ -63,6 +64,7 @@ for i in range(frames):
 
     state = new_state
 
+    # Every 100 frames, if we've crashed (so we have something to show)...
     if i % 100 == 0 and i > 0 and len(distances) > 0:
         print("%d - Average distance: %.2f" % (i, mean(distances)))
         print("Epsilon: %.5f" % pb.epsilon)
@@ -71,6 +73,7 @@ for i in range(frames):
 with open('results/loss-log.csv', 'w') as myfile:
     wr = csv.writer(myfile)
     wr.writerows(network.loss_log)
+print(results)
 with open('results/distances.csv', 'w') as myfile:
     wr = csv.writer(myfile)
     wr.writerows(results)

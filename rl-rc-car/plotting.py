@@ -44,8 +44,6 @@ def plot_file(filename, data_type='loss'):
     else:
         print("%f\t%f\n" % (arr.max(), arr.mean()))
 
-    # return  # Skip plotting, ironically.
-
     # Plot it.
     plt.clf()  # Clear.
     plt.title(data_type)
@@ -55,12 +53,13 @@ def plot_file(filename, data_type='loss'):
         plt.plot(y_av[:-50])
         plt.ylabel('Smoothed Loss')
         # plt.ylim(0, 5000)
-        plt.xlim(0, 250000)
+        # plt.xlim(0, 1000)
     else:
         plt.plot(y_av[:-5])
         plt.ylabel('Smoothed Distance')
-        plt.ylim(0, 4000)
+        # plt.ylim(0, 4000)
         # plt.xlim(0, 4000)
+    plt.show()
 
 
 if __name__ == "__main__":
