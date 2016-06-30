@@ -144,6 +144,9 @@ class GameState:
         x, y = self.car_body.position
         readings = self.get_sonar_readings(x, y, self.car_body.angle)
 
+        # For reward.
+        readings_reward = readings[:]
+
         # Add the direction to the state.
         direction = 1 if velocity_m == 5 else 0
         readings.append(direction)
@@ -152,7 +155,7 @@ class GameState:
         state = np.array([readings])
 
         # Set the reward.
-        if self.car_is_crashed(readings):
+        if self.car_is_crashed(readings_reward):
             reward = -500
         else:
             if velocity_m < 0:
@@ -160,7 +163,7 @@ class GameState:
                 reward = -1
             else:
                 # Higher readings are better, so return the sum.
-                reward = int(self.sum_readings(readings) / 10)
+                reward = int(self.sum_readings(readings_reward) / 10)
         self.num_steps += 1
 
         return reward, state
@@ -182,7 +185,7 @@ class GameState:
 
     def car_is_crashed(self, readings):
         for reading in readings:
-            if reading < 2:
+            if reading < 1:
                 return True
         return False
 

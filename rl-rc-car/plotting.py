@@ -21,7 +21,7 @@ def plot_file(filename, data_type='loss'):
         # Turn our column into an array.
         y = []
         for row in reader:
-            if type == 'loss':
+            if data_type == 'loss':
                 y.append(float(row[0]))
             else:
                 y.append(float(row[1]))
@@ -64,5 +64,5 @@ def plot_file(filename, data_type='loss'):
 
 
 if __name__ == "__main__":
-    plot_file('loss-log.csv', 'loss')
-    plot_file('distances.csv', 'distance')
+    plot_file('results/loss-log.csv', 'loss')
+    plot_file('results/distances.csv', 'distance')
