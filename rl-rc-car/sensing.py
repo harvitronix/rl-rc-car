@@ -8,8 +8,7 @@ import RPi.GPIO as GPIO
 import time
 
 # Input pins.
-# PINS = [24, 21]
-PINS = [24]
+PINS = [24, 21]
 
 
 class Sensors:
