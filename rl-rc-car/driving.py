@@ -1,35 +1,23 @@
 """
-This is the real-world equivalent of the simulation's playing.py.
+This is the real-world equivalent of the simulation's learning.py.
 """
-from nn import neural_net
-import numpy as np
+from becho import becho, bechonet
 from rccar import RCCar
 
-
-def get_model():
-    saved_model = 'saved-models-driving/1000-1000-400-50000-100000.h5'
-    return neural_net(3, [1000, 1000], saved_model)
-
-
-def get_action_from_net(readings, model):
-    return np.argmax(model.predict(readings, batch_size=1))
-
-
 if __name__ == '__main__':
-    print("Running.")
-    model = get_model()
+    print("Driving.")
+    network = bechonet.BechoNet(num_actions=6, num_inputs=3,
+                                nodes_1=256, nodes_2=256, verbose=True,
+                                load_weights=True,
+                                weights_file='saved-models/new-ir-750.h5')
+    pb = becho.ProjectBecho(network, num_actions=6, num_inputs=3,
+                            verbose=True, enable_training=False)
     car = RCCar()
 
     input("Net is prepped. Press enter to run.")
 
     print("Doing loops.")
     for i in range(500):
-        readings = car.get_readings()
-        if car.car_is_crashed(readings):
-            print("Recovering.")
-            car.recover()
-        else:
-            action = get_action_from_net(readings, model)
-            car.step(action)
+        car.step(pb.get_action(car.get_readings()))
 
     car.cleanup_gpio()

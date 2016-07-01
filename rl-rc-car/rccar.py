@@ -61,29 +61,31 @@ class RCCar:
 
         readings = [int(float(i)) for i in readings]
 
-        # The max value in training is 39, so let's reduce to see
-        # what happens.
-        """
-        reduced_readings = []
-        for reading in readings:
-            if reading > 39:
-                reading = 39
-            reduced_readings.append(reading)
-        """
-        print(readings)
         return np.array([readings])
 
-    def recover(self):
-        # Back up.
-        self.perform_action(2, True)
+    def perform_action(self, action):
+        """
+        Actions are:
+        0: right, forward
+        1: left, forward
+        2: straight, forward
+        3: right, back
+        4: left, back
+        5: straight, back
+        """
+        # Forward or back.
+        if 0 <= action <= 2:
+            reverse = False
+        else:
+            reverse = True
 
-    def perform_action(self, action, reverse=False):
-        if action == 1:  # Turn left.
-            GPIO.output(LEFT_PIN, 1)
-            print("Turning left.")
-        elif action == 0:  # Turn right.
+        # Turning.
+        if action == 0 or action == 3:  # Turn right.
             GPIO.output(RIGHT_PIN, 1)
             print("Turning right.")
+        elif action == 1 or action == 4:  # Turn left.
+            GPIO.output(LEFT_PIN, 1)
+            print("Turning left.")
         else:
             print("Going straight.")
 
@@ -101,6 +103,7 @@ class RCCar:
         GPIO.output(FORWARD_PIN, 0)
 
         # Wait a bit longer before turning off the direction.
+        # This lets the car wind down in a turn.
         time.sleep(STEERING_DELAY)
         GPIO.output(LEFT_PIN, 0)
         GPIO.output(RIGHT_PIN, 0)
@@ -109,12 +112,12 @@ class RCCar:
         if ITER_PAUSE:
             time.sleep(ITER_PAUSE)
 
-    def car_is_crashed(self, readings):
-        # If any of the readings show less than 5cm, we're crashed.
-        for reading in readings[0]:
-            if reading < 7:
-                return True
-        return False
+    def proximity_alert(self, readings):
+        # If either of the readings show 1, we've detected something.
+        if sum(readings) > 0:
+            return True
+        else:
+            return False
 
 
 if __name__ == '__main__':
