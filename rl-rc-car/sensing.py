@@ -9,7 +9,7 @@ import time
 
 # Input pins.
 # PINS = [24, 21]
-PINS = [21]
+PINS = [24]
 
 
 class Sensors:
