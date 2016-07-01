@@ -8,8 +8,8 @@ inputs = 4
 actions = 6
 
 # Just change these.
-train_or_show = 'laskdjf'
-weights_file = 'saved-models/testing-9000.h5'
+train_or_show = 'asf'
+weights_file = 'saved-models/testing-9000.h5-6000.h5'
 
 if train_or_show == 'train':
     enable_training = True
