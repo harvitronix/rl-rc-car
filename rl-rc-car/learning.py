@@ -3,13 +3,13 @@ from sim import carmunk
 from statistics import mean
 import csv
 
-frames = 10000
-inputs = 4
+frames = 1000
+inputs = 3
 actions = 6
 
 # Just change these.
-train_or_show = 'asf'
-weights_file = 'saved-models/testing-9000.h5-6000.h5'
+train_or_show = 'safd'
+weights_file = 'saved-models/new-ir-750.h5'
 
 if train_or_show == 'train':
     enable_training = True
@@ -21,7 +21,7 @@ else:
     save_weights = False
 
 network = bechonet.BechoNet(num_actions=actions, num_inputs=inputs,
-                            nodes_1=1000, nodes_2=1000, verbose=True,
+                            nodes_1=256, nodes_2=256, verbose=True,
                             load_weights=load_weights,
                             weights_file=weights_file,
                             save_weights=save_weights)
@@ -29,16 +29,16 @@ pb = becho.ProjectBecho(network, frames=frames, num_actions=actions,
                         batch_size=32, min_epsilon=0.1, num_inputs=inputs,
                         replay_size=100000, gamma=0.9, verbose=True,
                         enable_training=enable_training,
-                        save_steps=1000)
+                        save_steps=750)
 
 rewards = []
 distances = []
 results = []
 distance = 0
 
-repeat_action = 2
+repeat_action = 3
 
-game_state = carmunk.GameState(noisey=True)
+game_state = carmunk.GameState(noisey=False)
 _, state = game_state.frame_step((2))
 
 for i in range(frames):
@@ -53,7 +53,7 @@ for i in range(frames):
         pb.step(state, action, reward, new_state, False)
 
     # Mimic terminal for reporting.
-    if reward == -500:
+    if reward == -10:
         print("Crashed %d." % i)
         # Give us some info.
         distances.append(distance)
@@ -73,7 +73,3 @@ for i in range(frames):
 with open('results/loss-log.csv', 'w') as myfile:
     wr = csv.writer(myfile)
     wr.writerows(network.loss_log)
-print(results)
-with open('results/distances.csv', 'w') as myfile:
-    wr = csv.writer(myfile)
-    wr.writerows(results)

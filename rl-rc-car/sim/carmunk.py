@@ -127,10 +127,13 @@ class GameState:
             velocity_m = -50
 
         # Turning.
+        turning = False
         if action == 0 or action == 3:  # Turn right.
             self.car_body.angle -= .2
+            turning = True
         elif action == 1 or action == 4:  # Turn left.
             self.car_body.angle += .2
+            turning = True
 
         driving_direction = Vec2d(1, 0).rotated(self.car_body.angle)
         self.car_body.velocity = velocity_m * driving_direction
@@ -158,15 +161,19 @@ class GameState:
         state = np.array([readings])
 
         # Set the reward.
-        if self.car_is_crashed(readings_reward):
-            reward = -500
+        if self.proximity_alert(readings_reward):
+            # If one of our sensors touches something...
+            reward = -10
+        elif velocity_m < 0:
+            # If we're going backwards, give negative reward.
+            reward = -2
+        elif turning:
+            # Less reward if turning.
+            reward = 1
         else:
-            if velocity_m < 0:
-                # If we're going backwards, give negative reward.
-                reward = -1
-            else:
-                # Higher readings are better, so return the sum.
-                reward = int(self.sum_readings(readings_reward) / 10)
+            # We're going straight.
+            reward = 2
+
         self.num_steps += 1
 
         return reward, state
@@ -186,18 +193,11 @@ class GameState:
         direction = Vec2d(1, 0).rotated(self.cat_body.angle)
         self.cat_body.velocity = speed * direction
 
-    def car_is_crashed(self, readings):
-        for reading in readings:
-            if reading < 2:
-                return True
-        return False
-
-    def sum_readings(self, readings):
-        """Sum the number of non-zero readings."""
-        tot = 0
-        for i in readings:
-            tot += i
-        return tot
+    def proximity_alert(self, readings):
+        if sum(readings) > 0:
+            return True
+        else:
+            return False
 
     def get_sonar_readings(self, x, y, angle):
         readings = []
@@ -210,12 +210,12 @@ class GameState:
         """
         # Make our arms.
         arm_left = self.make_sonar_arm(x, y)
-        arm_middle = arm_left
+        # arm_middle = arm_left
         arm_right = arm_left
 
         # Rotate them and get readings.
         readings.append(self.get_arm_distance(arm_left, x, y, angle, 0.75))
-        readings.append(self.get_arm_distance(arm_middle, x, y, angle, 0))
+        # readings.append(self.get_arm_distance(arm_middle, x, y, angle, 0))
         readings.append(self.get_arm_distance(arm_right, x, y, angle, -0.75))
 
         if self.noisey:
@@ -244,10 +244,15 @@ class GameState:
     def get_arm_distance(self, arm, x, y, angle, offset):
         # Used to count the distance.
         i = 0
+        hit_something = 0
+        max_distance = 5  # If i is less than this, we hit something.
 
         # Look at each point and see if we've hit something.
         for point in arm:
             i += 1
+
+            if i > max_distance:
+                break
 
             # Move the point to the right spot.
             rotated_p = self.get_rotated_point(
@@ -258,17 +263,19 @@ class GameState:
             # if we did.
             if rotated_p[0] <= 0 or rotated_p[1] <= 0 \
                     or rotated_p[0] >= width or rotated_p[1] >= height:
-                return i  # Sensor is off the screen.
+                hit_something = 1
+                break
             else:
                 obs = screen.get_at(rotated_p)
                 if self.get_track_or_not(obs) != 0:
-                    return i
+                    hit_something = 1
+                    break
 
             if show_sensors:
                 pygame.draw.circle(screen, (255, 255, 255), (rotated_p), 2)
 
         # Return the distance for the arm.
-        return i
+        return hit_something
 
     def make_sonar_arm(self, x, y):
         spread = 8  # Default spread.
