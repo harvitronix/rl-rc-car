@@ -75,7 +75,7 @@ class RCCar:
         GPIO.output(self.forward_p, 0)
 
     def proximity_alert(self, readings):
-        if readings[0] == 0 or readings[2] == 0 or readings[1] < 5:
+        if readings[0][0] == 0 or readings[0][2] == 0 or readings[0][1] < 5:
             return True
         else:
             return False
