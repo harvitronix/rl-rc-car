@@ -8,10 +8,10 @@ inputs = 4
 actions = 6
 
 # Just change these.
-train_or_show = 'train'
-weights_file = 'saved-models/sonar-and-ir'
+train = False
+weights_file = 'saved-models/sonar-and-ir-4500.h5'
 
-if train_or_show == 'train':
+if train:
     enable_training = True
     load_weights = False
     save_weights = True
