@@ -73,6 +73,15 @@ class Sensors:
 
         return readings
 
+    def get_all_readings(self):
+        """
+        This is specific to how we need the readings. Should be generalized.
+        """
+        ir_readings = self.get_ir_readings()
+        sonar_readings = self.get_sonar_readings()
+
+        return [ir_readings[0], sonar_readings[0], ir_readings[1]]
+
     def cleanup_gpio(self):
         gpio.cleanup()
 
@@ -84,7 +93,6 @@ if __name__ == '__main__':
 
     sensors = Sensors(ir_pins, sonar_pins)
     for i in range(100):
-        print(sensors.get_ir_readings())
-        print(sensors.get_sonar_readings())
+        print(sensors.get_all_readings())
         time.sleep(2)
     sensors.cleanup_gpio()
