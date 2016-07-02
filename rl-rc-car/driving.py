@@ -32,7 +32,7 @@ if __name__ == '__main__':
         print("Doing action %d." % action)
         print("-"*80)
 
-        if car.proximity_alert():
+        if car.proximity_alert(readings):
             print('Crashed!')
 
     car.cleanup_gpio()
