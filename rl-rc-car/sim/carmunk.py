@@ -153,10 +153,6 @@ class GameState:
         # For reward.
         readings_reward = readings[:]
 
-        # Add the direction to the state.
-        direction = 1 if velocity_m == 5 else 0
-        readings.append(direction)
-
         # Numpy it.
         state = np.array([readings])
 

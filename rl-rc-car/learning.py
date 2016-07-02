@@ -4,7 +4,7 @@ from statistics import mean
 import csv
 
 frames = 10000
-inputs = 4
+inputs = 3
 actions = 6
 
 # Just change these.
@@ -26,7 +26,7 @@ network = bechonet.BechoNet(num_actions=actions, num_inputs=inputs,
                             weights_file=weights_file,
                             save_weights=save_weights)
 pb = becho.ProjectBecho(network, frames=frames, num_actions=actions,
-                        batch_size=32, min_epsilon=0.1, num_inputs=inputs,
+                        batch_size=50, min_epsilon=0.1, num_inputs=inputs,
                         replay_size=100000, gamma=0.9, verbose=True,
                         enable_training=enable_training,
                         save_steps=750)

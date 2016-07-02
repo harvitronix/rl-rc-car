@@ -113,8 +113,7 @@ class RCCar:
             time.sleep(ITER_PAUSE)
 
     def proximity_alert(self, readings):
-        # If either of the readings show 1, we've detected something.
-        if sum(readings) > 0:
+        if readings[0] == 0 or readings[2] == 0 or readings[1] < 5:
             return True
         else:
             return False
