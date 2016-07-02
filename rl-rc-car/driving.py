@@ -17,7 +17,7 @@ if __name__ == '__main__':
         network, num_actions=6, num_inputs=3,
         verbose=True, enable_training=False
     )
-    car = RCCar()
+    car = RCCar(apply_time=0.5)
     sensors = SensorClient()
 
     input("Ready to roll! Press any key to go.")
