@@ -8,12 +8,13 @@ import time
 
 class RCCar:
     def __init__(self, left_p=13, right_p=15, forward_p=12, backward_p=11,
-                 apply_time=0.3):
+                 apply_time=0.3, wait_time=0):
         self.left_p = left_p
         self.right_p = right_p
         self.forward_p = forward_p
         self.backward_p = backward_p
         self.apply_time = apply_time
+        self.wait_time = wait_time
 
         print("Setting up GPIO pins.")
         GPIO.setmode(GPIO.BOARD)
@@ -68,17 +69,17 @@ class RCCar:
             GPIO.output(self.backward_p, 1)
             print("Going backwards.")
 
-        # Pausing.
+        # Acceling.
         if self.apply_time > 0:
             time.sleep(self.apply_time)
 
-        # Temporarily stop motion here. Tries to slow things down.
+        # Stop moving...
         GPIO.output(self.backward_p, 0)
         GPIO.output(self.forward_p, 0)
 
-        # Pausing.
-        if self.apply_time > 0:
-            time.sleep(self.apply_time)
+        # Wait.
+        if self.wait_time > 0:
+            time.sleep(self.wait_time)
 
     def proximity_alert(self, readings):
         if readings[0][0] == 0 or readings[0][2] == 0 or readings[0][1] < 5:
