@@ -10,7 +10,10 @@ LEFT_PIN = 13
 RIGHT_PIN = 15
 FORWARD_PIN = 12
 BACKWARD_PIN = 11
-MOVE_DURATION = 0.3  # Time to apply forward/backward force.
+
+# Time in seconds to run each action.
+# 0 = continuous.
+APPLY_TIME = 0.3
 
 
 class RCCar:
@@ -44,9 +47,13 @@ class RCCar:
         """
         # Forward or back.
         if 0 <= action <= 2:
-            reverse = False
+            # Forwards.
+            GPIO.output(BACKWARD_PIN, 0)
+            GPIO.output(FORWARD_PIN, 1)
         else:
-            reverse = True
+            # Backwards.
+            GPIO.output(FORWARD_PIN, 0)
+            GPIO.output(BACKWARD_PIN, 1)
 
         # Turning.
         if action == 0 or action == 3:  # Turn right.
@@ -62,17 +69,13 @@ class RCCar:
             GPIO.output(RIGHT_PIN, 0)
             print("Going straight.")
 
-        # Accelerating.
-        if reverse:
-            GPIO.output(FORWARD_PIN, 0)
-            GPIO.output(BACKWARD_PIN, 1)
-        else:
-            GPIO.output(BACKWARD_PIN, 0)
-            GPIO.output(FORWARD_PIN, 1)
-
         # Pausing.
-        if MOVE_DURATION > 0:
-            time.sleep(MOVE_DURATION)
+        if APPLY_TIME > 0:
+            time.sleep(APPLY_TIME)
+
+        # Temporarily stop motion here. Tries to slow things down.
+        GPIO.output(BACKWARD_PIN, 0)
+        GPIO.output(FORWARD_PIN, 0)
 
     def proximity_alert(self, readings):
         if readings[0] == 0 or readings[2] == 0 or readings[1] < 5:

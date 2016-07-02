@@ -31,6 +31,8 @@ class SensorClient:
 if __name__ == '__main__':
     # Testing it out.
     from becho import becho, bechonet
+    import numpy as np
+
     network = bechonet.BechoNet(
         num_actions=6, num_inputs=3,
         nodes_1=256, nodes_2=256, verbose=True,
@@ -44,6 +46,7 @@ if __name__ == '__main__':
     while True:
         # Get the reading.
         readings = sensors.get_readings()
+        readings = np.array([readings])
         print(readings)
 
         # Get the action.
