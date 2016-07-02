@@ -4,6 +4,7 @@ This is the real-world equivalent of the simulation's learning.py.
 from becho import becho, bechonet
 from rccar import RCCar
 from sensor_client import SensorClient
+import numpy as np
 
 if __name__ == '__main__':
     network = bechonet.BechoNet(
@@ -23,6 +24,7 @@ if __name__ == '__main__':
 
     for i in range(500):
         readings = sensors.get_readings()
+        readings = np.array([readings])
         action = pb.get_action(readings)
         car.step(action)
 

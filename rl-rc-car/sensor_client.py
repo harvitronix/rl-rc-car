@@ -4,7 +4,6 @@ http://ilab.cs.byu.edu/python/socket/echoclient.html
 """
 
 import socket
-import numpy as np
 import time
 
 
@@ -26,8 +25,7 @@ class SensorClient:
         readings = readings.split(', ')
         readings = [float(i) for i in readings]
 
-        # Numpy it.
-        return np.array([readings])
+        return readings
 
 
 if __name__ == '__main__':
