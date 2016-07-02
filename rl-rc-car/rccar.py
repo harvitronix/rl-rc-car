@@ -7,13 +7,13 @@ import time
 
 
 class RCCar:
-    def __init__(self, left_p=13, right_p=15,
-                 forward_p=12, backward_p=11,
+    def __init__(self, left_p=13, right_p=15, forward_p=12, backward_p=11,
                  apply_time=0.3):
         self.left_p = left_p
         self.right_p = right_p
         self.forward_p = forward_p
         self.backward_p = backward_p
+        self.apply_time = apply_time
 
         print("Setting up GPIO pins.")
         GPIO.setmode(GPIO.BOARD)
