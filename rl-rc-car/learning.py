@@ -9,7 +9,7 @@ actions = 6
 
 # Just change these.
 train = False
-weights_file = 'saved-models/sonar-and-ir-3750.h5'
+weights_file = 'saved-models/sonar-and-ir-9750.h5'
 
 if train:
     enable_training = True
