@@ -19,13 +19,15 @@ class Sensors:
         gpio.setmode(gpio.BCM)
 
         # Initialize the IR sensors.
-        if len(self.sonar_pins) > 0:
+        if len(self.ir_pins) > 0:
             for ir in self.ir_pins:
+                print("Setting pin %d as IN" % ir)
                 gpio.setup(ir, gpio.IN)
 
         # Initialize the sonar sensors.
         if len(self.sonar_pins) > 0:
             for sonar in self.sonar_pins:
+                print("Setting pin %d as OUT, %d as IN" % (sonar[0], sonar[1]))
                 gpio.setup(sonar[0], gpio.OUT)
                 gpio.setup(sonar[1], gpio.IN)
                 gpio.output(sonar[0], False)
@@ -44,7 +46,7 @@ class Sensors:
     def get_sonar_readings(self):
         readings = []
 
-        for sensor in self.ir_pins:
+        for sensor in self.sonar_pins:
             iterations = 0
 
             # Blip.
