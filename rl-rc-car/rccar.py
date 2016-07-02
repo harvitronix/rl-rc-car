@@ -47,10 +47,12 @@ class RCCar:
             # Forwards.
             GPIO.output(self.backward_p, 0)
             GPIO.output(self.forward_p, 1)
+            print("Going forwards.")
         else:
             # Backwards.
             GPIO.output(self.forward_p, 0)
             GPIO.output(self.backward_p, 1)
+            print("Going backwards.")
 
         # Turning.
         if action == 0 or action == 3:  # Turn right.

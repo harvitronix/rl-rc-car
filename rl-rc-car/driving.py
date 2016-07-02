@@ -28,11 +28,9 @@ if __name__ == '__main__':
         action = pb.get_action(readings)
         car.step(action)
 
-        print(readings)
-        print("Doing action %d." % action)
-        print("-"*80)
-
         if car.proximity_alert(readings):
             print('Crashed!')
+
+        print("-"*80)
 
     car.cleanup_gpio()
