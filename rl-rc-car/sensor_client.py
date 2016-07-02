@@ -14,12 +14,11 @@ class SensorClient:
         self.port = port
         self.size = size
 
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
     def get_readings(self):
-        self.s.connect((self.host, self.port))
-        readings = self.s.recv(self.size)
-        self.s.close()
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((self.host, self.port))
+        readings = s.recv(self.size)
+        s.close()
 
         # Turn our weird stringed list into an actual list.
         readings = readings.decode('utf-8')
