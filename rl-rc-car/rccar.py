@@ -17,7 +17,7 @@ MOVE_DURATION = 0.3  # Time to apply forward/backward force.
 STEERING_DELAY = 0.5  # Time to wait after we move before straightening.
 
 # Used for getting sensor readings.
-HOST = '192.168.2.13'
+HOST = '192.168.2.9'
 PORT = 8888
 SIZE = 1024
 
