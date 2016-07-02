@@ -42,18 +42,6 @@ class RCCar:
         4: left, back
         5: straight, back
         """
-        # Forward or back.
-        if 0 <= action <= 2:
-            # Forwards.
-            GPIO.output(self.backward_p, 0)
-            GPIO.output(self.forward_p, 1)
-            print("Going forwards.")
-        else:
-            # Backwards.
-            GPIO.output(self.forward_p, 0)
-            GPIO.output(self.backward_p, 1)
-            print("Going backwards.")
-
         # Turning.
         if action == 0 or action == 3:  # Turn right.
             GPIO.output(self.left_p, 0)
@@ -68,6 +56,18 @@ class RCCar:
             GPIO.output(self.right_p, 0)
             print("Going straight.")
 
+        # Forward or back.
+        if 0 <= action <= 2:
+            # Forwards.
+            GPIO.output(self.backward_p, 0)
+            GPIO.output(self.forward_p, 1)
+            print("Going forwards.")
+        else:
+            # Backwards.
+            GPIO.output(self.forward_p, 0)
+            GPIO.output(self.backward_p, 1)
+            print("Going backwards.")
+
         # Pausing.
         if self.apply_time > 0:
             time.sleep(self.apply_time)
@@ -75,6 +75,10 @@ class RCCar:
         # Temporarily stop motion here. Tries to slow things down.
         GPIO.output(self.backward_p, 0)
         GPIO.output(self.forward_p, 0)
+
+        # Pausing.
+        if self.apply_time > 0:
+            time.sleep(self.apply_time)
 
     def proximity_alert(self, readings):
         if readings[0][0] == 0 or readings[0][2] == 0 or readings[0][1] < 5:
