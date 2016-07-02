@@ -7,7 +7,7 @@ import socket
 import numpy as np
 import time
 
-HOST = '192.168.2.13'
+HOST = '192.168.2.9'
 PORT = 8888
 SIZE = 1024
 

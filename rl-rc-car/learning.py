@@ -3,15 +3,15 @@ from sim import carmunk
 from statistics import mean
 import csv
 
-frames = 1000
-inputs = 3
+frames = 10000
+inputs = 4
 actions = 6
 
 # Just change these.
-train_or_show = 'safd'
-weights_file = 'saved-models/new-ir-750.h5'
+train = False
+weights_file = 'saved-models/sonar-and-ir-4500.h5'
 
-if train_or_show == 'train':
+if train:
     enable_training = True
     load_weights = False
     save_weights = True

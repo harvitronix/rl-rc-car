@@ -9,7 +9,7 @@ if __name__ == '__main__':
     network = bechonet.BechoNet(num_actions=6, num_inputs=3,
                                 nodes_1=256, nodes_2=256, verbose=True,
                                 load_weights=True,
-                                weights_file='saved-models/new-ir-750.h5')
+                                weights_file='saved-models/new-ir-4500.h5')
     pb = becho.ProjectBecho(network, num_actions=6, num_inputs=3,
                             verbose=True, enable_training=False)
     car = RCCar()

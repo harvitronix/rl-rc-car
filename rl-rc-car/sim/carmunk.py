@@ -194,7 +194,7 @@ class GameState:
         self.cat_body.velocity = speed * direction
 
     def proximity_alert(self, readings):
-        if sum(readings) > 0:
+        if readings[0] == 0 or readings[2] == 0 or readings[1] < 2:
             return True
         else:
             return False
@@ -210,13 +210,17 @@ class GameState:
         """
         # Make our arms.
         arm_left = self.make_sonar_arm(x, y)
-        # arm_middle = arm_left
+        arm_middle = arm_left
         arm_right = arm_left
 
         # Rotate them and get readings.
-        readings.append(self.get_arm_distance(arm_left, x, y, angle, 0.75))
-        # readings.append(self.get_arm_distance(arm_middle, x, y, angle, 0))
-        readings.append(self.get_arm_distance(arm_right, x, y, angle, -0.75))
+        readings.append(self.get_arm_distance(
+            arm_left, x, y, angle, 0.75, False
+        ))
+        readings.append(self.get_arm_distance(arm_middle, x, y, angle, 0))
+        readings.append(self.get_arm_distance(
+            arm_right, x, y, angle, -0.75, False
+        ))
 
         if self.noisey:
             readings = self.make_sonar_noise(readings)
@@ -241,17 +245,21 @@ class GameState:
 
         return new_readings
 
-    def get_arm_distance(self, arm, x, y, angle, offset):
+    def get_arm_distance(self, arm, x, y, angle, offset, sonar=True):
+        """
+        We use this same method for both IR and sonar. Sonar returns a distance
+        while IR just returns a 0 or 1 depending on if it detected something.
+        For sonar, 1 = didn't detect anything, 0 = detected something.
+        """
         # Used to count the distance.
         i = 0
-        hit_something = 0
-        max_distance = 5  # If i is less than this, we hit something.
+        max_sonar_distance = 5
 
         # Look at each point and see if we've hit something.
         for point in arm:
             i += 1
 
-            if i > max_distance:
+            if not sonar and i > max_sonar_distance:
                 break
 
             # Move the point to the right spot.
@@ -263,19 +271,24 @@ class GameState:
             # if we did.
             if rotated_p[0] <= 0 or rotated_p[1] <= 0 \
                     or rotated_p[0] >= width or rotated_p[1] >= height:
-                hit_something = 1
-                break
+                break  # Distance is the current i.
             else:
                 obs = screen.get_at(rotated_p)
                 if self.get_track_or_not(obs) != 0:
-                    hit_something = 1
-                    break
+                    break  # Distance is the current i.
 
             if show_sensors:
                 pygame.draw.circle(screen, (255, 255, 255), (rotated_p), 2)
 
-        # Return the distance for the arm.
-        return hit_something
+        # Depending on if it's sonar or IR, we return different values.
+        if sonar:
+            return i
+        else:
+            # It's IR.
+            if i <= max_sonar_distance:
+                return 0
+            else:
+                return 1
 
     def make_sonar_arm(self, x, y):
         spread = 8  # Default spread.
