@@ -1,6 +1,5 @@
 """
-The car will callt he server to get readings. So the purpose of this is
-to receive a connection and serve readings.
+This little diddy serves up the sensor readings when called.
 
 Base script from:
 http://ilab.cs.byu.edu/python/socket/echoserver.html
@@ -18,14 +17,18 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((host, port))
 s.listen(backlog)
 
-sensors = Sensors()
+# Input pins.
+ir_pins = [24, 21]
+sonar_pins = [[25, 8]]
+
+# Get our sensor class.
+sensors = Sensors(ir_pins, sonar_pins)
 
 while 1:
     client, address = s.accept()
-    data = str(sensors.get_readings())
+    data = str(sensors.get_all_readings())
     try:
-        print("Sending: ")
-        print(data)
+        print("Sending: %s" % str(data))
         client.send(data.encode(encoding='utf_8'))
     except:
         print("Couldn't send data.")
