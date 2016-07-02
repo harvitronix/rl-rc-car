@@ -83,6 +83,6 @@ if __name__ == '__main__':
     sensors = Sensors(ir_pins, sonar_pins)
     for i in range(100):
         print(sensors.get_ir_readings())
-        print(sensors.get_sonar_reading())
+        print(sensors.get_sonar_readings())
         time.sleep(2)
     sensors.cleanup_gpio()
