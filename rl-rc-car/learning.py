@@ -46,6 +46,9 @@ for i in range(frames):
     distance += 1
     action = pb.get_action(state)
 
+    print(state, action)
+    input("Press enter.")
+
     for x in range(repeat_action):
         reward, new_state = game_state.frame_step(action)
 

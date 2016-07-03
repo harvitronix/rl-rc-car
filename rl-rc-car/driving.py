@@ -52,6 +52,9 @@ if __name__ == '__main__':
         # Get action.
         action = pb.get_action(state)
 
+        print(state, action)
+        input("Press enter.")
+
         # Take action.
         car.step(action)
 

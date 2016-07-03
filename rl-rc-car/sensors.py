@@ -95,7 +95,7 @@ class Sensors:
         ir_reading_r = self.irs[1].get_reading()
         sonar_reading = self.sonars[0].get_reading()
 
-        return [ir_reading_l, sonar_reading, ir_reading_r]
+        return [ir_reading_l, int(sonar_reading), ir_reading_r]
 
     def cleanup_gpio(self):
         gpio.cleanup()
