@@ -95,6 +95,9 @@ class Sensors:
         ir_reading_r = self.irs[1].get_reading()
         sonar_reading = self.sonars[0].get_reading()
 
+        # Limit sonar max distance to match sim.
+        sonar_reading = 35 if sonar_reading > 30 else sonar_reading
+
         return [ir_reading_l, sonar_reading, ir_reading_r]
 
     def cleanup_gpio(self):
