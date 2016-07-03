@@ -62,9 +62,9 @@ if __name__ == '__main__':
 
     for i in range(500):
         # Get action.
-        action = pb.get_action(state)
+        action = pb.get_action(state.astype(int))
 
-        print(state, action)
+        print(state.astype(int), action)
         input("Press enter.")
 
         # Take action.
