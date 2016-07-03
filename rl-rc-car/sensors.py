@@ -19,6 +19,8 @@ class SonarSensor:
         gpio.setup(self.out_p, gpio.OUT)
         gpio.setup(self.in_p, gpio.IN)
         gpio.output(self.out_p, False)
+        print("Initialized a sonar sensor at %d (in) %d (out)" %
+              (self.in_p, self.out_p))
 
     def get_reading(self):
         iterations = 0
@@ -50,6 +52,8 @@ class IRSensor:
     def __init__(self, in_p):
         self.in_p = in_p
         gpio.setup(self.in_p, gpio.IN)
+        print("Initialized an IR proximity sensor at %d" %
+              (self.in_p))
 
     def get_reading(self):
         return gpio.input(self.in_p)
