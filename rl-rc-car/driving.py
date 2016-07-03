@@ -70,19 +70,21 @@ if __name__ == '__main__':
         # Take action.
         car.step(action)
 
-        # Get new readings and reward.
+        # Get new readings.
+        new_state = sensors.get_readings()
+        new_state = np.array([new_state])
+
         if enable_training:
-            new_state = sensors.get_readings()
-            new_state = np.array([new_state])
+            # Get reward.
             reward = get_reward_from_sensors(car, new_state, action)
 
             # Train.
             pb.step(state, action, reward, new_state, False)
 
-            # Override state.
-            state = new_state
+        # Override state.
+        state = new_state
 
-        if car.proximity_alert(new_state):
+        if car.proximity_alert(state):
             print('Proximity alert!')
 
         print("-"*80)
