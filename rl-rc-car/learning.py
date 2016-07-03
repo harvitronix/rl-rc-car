@@ -8,7 +8,7 @@ inputs = 3
 actions = 6
 
 # Just change these.
-train = True
+train = False
 weights_file = 'saved-models/sonar-and-ir.h5'
 
 if train:
@@ -54,7 +54,7 @@ for i in range(frames):
 
     # Mimic terminal for reporting.
     if reward == -10:
-        print("Crashed %d." % i)
+        print("Proximity alert at frame %d." % i)
         # Give us some info.
         distances.append(distance)
         if len(distances) > 25:
