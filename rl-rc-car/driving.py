@@ -57,8 +57,8 @@ if __name__ == '__main__':
 
         # Get new readings and reward.
         new_state = sensors.get_readings()
-        reward = get_reward_from_sensors(car, new_state, action)
         new_state = np.array([new_state])
+        reward = get_reward_from_sensors(car, new_state, action)
 
         # Train.
         print(state, action, reward, new_state)
