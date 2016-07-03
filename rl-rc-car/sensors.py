@@ -1,8 +1,9 @@
 """
-This is a little class that reads from one or more sonar and/or IR sensor.
+This module holds classes for interacting with our sensors.
 
-IR just has a single IN pin that we read from, while sonar has an OUT
-and an IN that we interact with.
+Currently supports:
+- IR proximity
+- Sonar
 
 Example: ir_pins = [24, 25, 28]
 Example: sonar_pins = [[24, 25], [28, 29]]
@@ -11,7 +12,54 @@ import RPi.GPIO as gpio
 import time
 
 
+class SonarSensor:
+    def __init__(self, in_p, out_p):
+        self.in_p = in_p
+        self.out_p = out_p
+        gpio.setup(self.out_p, gpio.OUT)
+        gpio.setup(self.in_p, gpio.IN)
+        gpio.output(self.out_p, False)
+
+    def get_reading(self):
+        iterations = 0
+
+        # Blip.
+        gpio.output(self.out_p, True)
+        time.sleep(0.00001)
+        gpio.output(self.out_p, False)
+
+        # Read.
+        while gpio.input(self.in_p) == 0 and iterations < 10000:
+            pulse_start = time.time()
+            iterations += 1
+
+        while gpio.input(self.in_p) == 1:
+            pulse_end = time.time()
+
+        # Turn time into distance.
+        try:
+            pulse_duration = pulse_end - pulse_start
+            distance = pulse_duration * 17150
+        except:
+            distance = 0
+
+        return distance
+
+
+class IRSensor:
+    def __init__(self, in_p):
+        self.in_p = in_p
+        gpio.setup(self.in_p, gpio.IN)
+
+    def get_reading(self):
+        return gpio.input(self.in_p)
+
+
 class Sensors:
+    """
+    While the above classes are general to the sensor, this class is used
+    specifically to get the three sensors we use on Robocar.
+    """
     def __init__(self, ir_pins, sonar_pins):
         self.ir_pins = ir_pins
         self.sonar_pins = sonar_pins
@@ -19,68 +67,31 @@ class Sensors:
         gpio.setmode(gpio.BCM)
 
         # Initialize the IR sensors.
+        self.irs = []
         if len(self.ir_pins) > 0:
             for ir in self.ir_pins:
-                print("Setting pin %d as IN" % ir)
-                gpio.setup(ir, gpio.IN)
+                self.irs.append(IRSensor(ir))
 
         # Initialize the sonar sensors.
+        self.sonars = []
         if len(self.sonar_pins) > 0:
             for sonar in self.sonar_pins:
-                print("Setting pin %d as OUT, %d as IN" % (sonar[0], sonar[1]))
-                gpio.setup(sonar[0], gpio.OUT)
-                gpio.setup(sonar[1], gpio.IN)
-                gpio.output(sonar[0], False)
+                self.sonars.append(SonarSensor(sonar[1], sonar[0]))
 
         # Wait for sensors to settle.
         print("Initializing sensors.")
         time.sleep(2)
         print("Ready.")
 
-    def get_ir_readings(self):
-        readings = []
-        for sensor in self.ir_pins:
-            readings.append(gpio.input(sensor))
-        return readings
-
-    def get_sonar_readings(self):
-        readings = []
-
-        for sensor in self.sonar_pins:
-            iterations = 0
-
-            # Blip.
-            gpio.output(sensor[0], True)
-            time.sleep(0.00001)
-            gpio.output(sensor[0], False)
-
-            # Read.
-            while gpio.input(sensor[1]) == 0 and iterations < 10000:
-                pulse_start = time.time()
-                iterations += 1
-
-            while gpio.input(sensor[1]) == 1:
-                pulse_end = time.time()
-
-            # Turn time into distance.
-            try:
-                pulse_duration = pulse_end - pulse_start
-                distance = pulse_duration * 17150
-            except:
-                distance = 0
-
-            readings.append(distance)
-
-        return readings
-
     def get_all_readings(self):
         """
         This is specific to how we need the readings. Should be generalized.
         """
-        ir_readings = self.get_ir_readings()
-        sonar_readings = self.get_sonar_readings()
+        ir_reading_l = self.irs[0].get_reading()
+        ir_reading_r = self.irs[1].get_reading()
+        sonar_reading = self.sonars[0].get_reading()
 
-        return [ir_readings[0], sonar_readings[0], ir_readings[1]]
+        return [ir_reading_l, sonar_reading, ir_reading_r]
 
     def cleanup_gpio(self):
         gpio.cleanup()

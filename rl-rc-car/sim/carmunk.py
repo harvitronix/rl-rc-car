@@ -129,10 +129,10 @@ class GameState:
         # Turning.
         turning = False
         if action == 0 or action == 3:  # Turn right.
-            self.car_body.angle -= .05
+            self.car_body.angle -= .03
             turning = True
         elif action == 1 or action == 4:  # Turn left.
-            self.car_body.angle += .05
+            self.car_body.angle += .03
             turning = True
 
         driving_direction = Vec2d(1, 0).rotated(self.car_body.angle)

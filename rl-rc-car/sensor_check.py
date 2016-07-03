@@ -13,7 +13,6 @@ Actions are:
 """
 from rccar import RCCar
 from sensor_client import SensorClient
-import time
 
 if __name__ == '__main__':
     car = RCCar(apply_time=0.2, wait_time=0.4)
