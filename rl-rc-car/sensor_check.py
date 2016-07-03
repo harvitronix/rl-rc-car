@@ -11,12 +11,12 @@ Actions are:
 5: straight, back
 
 """
-#from rccar import RCCar
+from rccar import RCCar
 from sensor_client import SensorClient
 import time
 
 if __name__ == '__main__':
-    #car = RCCar(apply_time=0.2, wait_time=0.4)
+    car = RCCar(apply_time=0.2, wait_time=0.4)
     sensors = SensorClient()
 
     input("Ready to roll! Press any key to go.")
@@ -50,7 +50,7 @@ if __name__ == '__main__':
         print("Taking action %d" % action)
 
         # Take action.
-        # car.step(action)
+        car.step(action)
 
         input("Press enter to take the next step.")
         print("-"*80)
