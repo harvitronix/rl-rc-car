@@ -30,13 +30,13 @@ if __name__ == '__main__':
         num_actions=6, num_inputs=3,
         nodes_1=256, nodes_2=256, verbose=True,
         load_weights=True,
-        weights_file='saved-models/realcar.h5',
+        weights_file='saved-models/sonar-and-ir.h5',
         save_weights=True
     )
     pb = becho.ProjectBecho(
         network, num_actions=6, num_inputs=3,
         verbose=True, enable_training=False,
-        batch_size=50, min_epsilon=0.1, epsilon=1,
+        batch_size=50, min_epsilon=0.05, epsilon=0.05,
         replay_size=100000, gamma=0.9, save_steps=100
     )
     car = RCCar(apply_time=0.2, wait_time=0.4)
