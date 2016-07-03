@@ -26,16 +26,28 @@ def get_reward_from_sensors(car, readings, action):
 
 
 if __name__ == '__main__':
+    train = False
+    weights_file = 'saved-models/sonar-and-ir.h5'
+
+    if train:
+        enable_training = True
+        load_weights = False
+        save_weights = True
+    else:
+        enable_training = False
+        load_weights = True
+        save_weights = False
+
     network = bechonet.BechoNet(
         num_actions=6, num_inputs=3,
         nodes_1=256, nodes_2=256, verbose=True,
-        load_weights=True,
-        weights_file='saved-models/sonar-and-ir.h5',
-        save_weights=True
+        load_weights=load_weights,
+        weights_file=weights_file,
+        save_weights=save_weights
     )
     pb = becho.ProjectBecho(
         network, num_actions=6, num_inputs=3,
-        verbose=True, enable_training=False,
+        verbose=True, enable_training=enable_training,
         batch_size=50, min_epsilon=0.05, epsilon=0.05,
         replay_size=100000, gamma=0.9, save_steps=100
     )
@@ -59,16 +71,16 @@ if __name__ == '__main__':
         car.step(action)
 
         # Get new readings and reward.
-        new_state = sensors.get_readings()
-        new_state = np.array([new_state])
-        reward = get_reward_from_sensors(car, new_state, action)
+        if enable_training:
+            new_state = sensors.get_readings()
+            new_state = np.array([new_state])
+            reward = get_reward_from_sensors(car, new_state, action)
 
-        # Train.
-        print(state, action, reward, new_state)
-        pb.step(state, action, reward, new_state, False)
+            # Train.
+            pb.step(state, action, reward, new_state, False)
 
-        # Override state.
-        state = new_state
+            # Override state.
+            state = new_state
 
         if car.proximity_alert(new_state):
             print('Proximity alert!')
