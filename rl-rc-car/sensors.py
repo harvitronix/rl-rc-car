@@ -10,6 +10,7 @@ Example: sonar_pins = [[24, 25], [28, 29]]
 """
 import RPi.GPIO as gpio
 import time
+from statistics import median
 
 
 class SonarSensor:
@@ -22,30 +23,37 @@ class SonarSensor:
         print("Initialized a sonar sensor at %d (in) %d (out)" %
               (self.in_p, self.out_p))
 
-    def get_reading(self):
+    def get_reading(self, num_readings=5):
+        """
+        Take multiple readings and return the median. Helps with highly
+        variant and error-prone readings.
+        """
         iterations = 0
 
-        # Blip.
-        gpio.output(self.out_p, True)
-        time.sleep(0.00001)
-        gpio.output(self.out_p, False)
+        all_readings = []
 
-        # Read.
-        while gpio.input(self.in_p) == 0 and iterations < 10000:
-            pulse_start = time.time()
-            iterations += 1
+        for i in range(num_readings):
+            # Blip.
+            gpio.output(self.out_p, True)
+            time.sleep(0.00001)
+            gpio.output(self.out_p, False)
 
-        while gpio.input(self.in_p) == 1:
-            pulse_end = time.time()
+            # Read.
+            while gpio.input(self.in_p) == 0 and iterations < 10000:
+                pulse_start = time.time()
+                iterations += 1
 
-        # Turn time into distance.
-        try:
-            pulse_duration = pulse_end - pulse_start
-            distance = pulse_duration * 17150
-        except:
-            distance = 0
+            while gpio.input(self.in_p) == 1:
+                pulse_end = time.time()
 
-        return distance
+            # Turn time into distance.
+            try:
+                pulse_duration = pulse_end - pulse_start
+                all_readings.append(pulse_duration * 17150)
+            except:
+                all_readings.append(0)
+
+        return median(all_readings)
 
 
 class IRSensor:

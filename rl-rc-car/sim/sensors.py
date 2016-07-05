@@ -20,10 +20,10 @@ class Sensors:
         self.angle = angle
         self.noisey = noisey
         self.sensors = {
-            'l_p': {'angle_diff': 1.5, 'type': 'prox', 'reading:': None},
-            'r_p': {'angle_diff': -1.5, 'type': 'prox', 'reading:': None},
-            'l_d': {'angle_diff': 0.5, 'type': 'sonar', 'reading:': None},
-            'r_d': {'angle_diff': -0.5, 'type': 'sonar', 'reading:': None},
+            'l_p': {'angle_diff': 0.75, 'type': 'prox', 'reading:': None},
+            'r_p': {'angle_diff': -0.75, 'type': 'prox', 'reading:': None},
+            #'l_d': {'angle_diff': 0.5, 'type': 'sonar', 'reading:': None},
+            #'r_d': {'angle_diff': -0.5, 'type': 'sonar', 'reading:': None},
             'm_s': {'angle_diff': 0, 'type': 'sonar', 'reading:': None},
         }
         self.arm = self.make_sensor_arm(self.x, self.y)
@@ -48,7 +48,8 @@ class Sensors:
         Makes a usable "state". Hard coded. :(
         """
         state = []
-        s_order = ['l_p', 'l_d', 'm_s', 'r_d', 'r_p']
+        #s_order = ['l_p', 'l_d', 'm_s', 'r_d', 'r_p']
+        s_order = ['l_p', 'm_s', 'r_p']
         for i in s_order:
             state.append(self.sensors[i]['reading'])
         return state

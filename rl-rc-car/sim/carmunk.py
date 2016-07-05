@@ -187,8 +187,7 @@ class GameState:
         return reward, state
 
     def get_reward(self, readings, velocity, turning):
-        if readings[0] == 0 or readings[4] == 0 or readings[1] < 2 \
-                or readings[2] < 2 or readings[3] < 2:
+        if readings[0] == 0 or readings[2] == 0 or readings[1] < 2:
             # If one of our sensors touches something...
             reward = -10
         elif velocity < 0:

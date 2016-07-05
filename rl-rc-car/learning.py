@@ -5,12 +5,12 @@ import csv
 
 # frames = 10000
 frames = 10000
-inputs = 5
+inputs = 3
 actions = 6
 
 # Just change these.
-train = True
-weights_file = 'saved-models/sonar-and-ir-and-prox.h5'
+train = False
+weights_file = 'saved-models/sonar-and-ir-walls.h5'
 
 if train:
     enable_training = True
