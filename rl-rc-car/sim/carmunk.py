@@ -1,6 +1,7 @@
 import random
-import math
 import numpy as np
+from sim import sensors
+import sys
 
 import pygame
 from pygame.color import THECOLORS
@@ -61,15 +62,38 @@ class GameState:
             s.color = THECOLORS['red']
         self.space.add(static)
 
-        # Create some obstacles, semi-randomly.
-        # We'll create three and they'll move around to prevent over-fitting.
-        self.obstacles = []
-        self.obstacles.append(self.create_obstacle(200, 350, 100))
-        self.obstacles.append(self.create_obstacle(700, 200, 125))
-        self.obstacles.append(self.create_obstacle(600, 600, 35))
+        # Create some "walls".
+        self.create_circle_box(200, 125, 400, 400)
+        self.create_circle_box(0, 550, 800, 650)
+        self.create_circle_box(600, 300, 700, 550)
+        self.create_circle_box(550, 0, 1000, 150)
+        self.create_circle_box(850, 275, 1075, 450)
 
         # Create a cat.
         self.create_cat()
+
+    def create_circle_box(self, x1, y1, x2, y2):
+        """
+        Create a box out of circles. We do this ridiculousness because
+        for the life of me I can't figure out how to make a simple box!
+        """
+        # Defaults.
+        radius = 20
+        gap = 0
+
+        # Calculated values.
+        circumference = radius * 2
+        width = x2 - x1
+        height = y2 - y1
+        cols = int(width / (circumference + gap))
+        rows = int(height / (circumference + gap))
+
+        # Build a bunch of circles.
+        for y in range(rows):
+            for x in range(cols):
+                space_x = x1 + (x * (circumference + gap))
+                space_y = y1 + (y * (circumference + gap))
+                self.create_obstacle(space_x, space_y, radius)
 
     def create_obstacle(self, x, y, r):
         c_body = pymunk.Body(pymunk.inf, pymunk.inf)
@@ -103,10 +127,6 @@ class GameState:
         self.space.add(self.car_body, self.car_shape)
 
     def frame_step(self, action):
-        # Move obstacles.
-        if self.num_steps % 100 == 0:
-            self.move_obstacles()
-
         # Move cat.
         if self.num_steps % 5 == 0:
             self.move_cat()
@@ -148,19 +168,29 @@ class GameState:
 
         # Get the current location and the readings there.
         x, y = self.car_body.position
-        readings = self.get_sonar_readings(x, y, self.car_body.angle)
-
-        # For reward.
-        readings_reward = readings[:]
-
-        # Numpy it.
-        state = np.array([readings])
+        sensor_obj = sensors.Sensors(x, y, self.car_body.angle, width, height,
+                                     screen, pygame)
+        sensor_obj.set_readings()
+        readings_arr = sensor_obj.get_readings()
 
         # Set the reward.
-        if self.proximity_alert(readings_reward):
+        reward = self.get_reward(readings_arr, velocity_m, turning)
+
+        # Show sensors.
+        pygame.display.update()
+
+        # Numpy it.
+        state = np.array([readings_arr])
+
+        self.num_steps += 1
+
+        return reward, state
+
+    def get_reward(self, readings, velocity, turning):
+        if readings[0] == 0 or readings[2] == 0 or readings[1] < 2:
             # If one of our sensors touches something...
             reward = -10
-        elif velocity_m < 0:
+        elif velocity < 0:
             # If we're going backwards, give negative reward.
             reward = -2
         elif turning:
@@ -170,18 +200,7 @@ class GameState:
             # We're going straight.
             reward = 2
 
-        self.num_steps += 1
-
-        return reward, state
-
-    def move_obstacles(self):
-        # Randomly move obstacles around.
-        for obstacle in self.obstacles:
-            speed = random.randint(1, 5)
-            direction = Vec2d(1, 0).rotated(
-                self.car_body.angle + random.randint(-2, 2)
-            )
-            obstacle.velocity = speed * direction
+        return reward
 
     def move_cat(self):
         speed = random.randint(50, 120)
@@ -189,129 +208,6 @@ class GameState:
         direction = Vec2d(1, 0).rotated(self.cat_body.angle)
         self.cat_body.velocity = speed * direction
 
-    def proximity_alert(self, readings):
-        if readings[0] == 0 or readings[2] == 0 or readings[1] < 2:
-            return True
-        else:
-            return False
-
-    def get_sonar_readings(self, x, y, angle):
-        readings = []
-        """
-        Instead of using a grid of boolean(ish) sensors, sonar readings
-        simply return N "distance" readings, one for each sonar
-        we're simulating. The distance is a count of the first non-zero
-        reading starting at the object. For instance, if the fifth sensor
-        in a sonar "arm" is non-zero, then that arm returns a distance of 5.
-        """
-        # Make our arms.
-        arm_left = self.make_sonar_arm(x, y)
-        arm_middle = arm_left
-        arm_right = arm_left
-
-        # Rotate them and get readings.
-        readings.append(self.get_arm_distance(
-            arm_left, x, y, angle, 0.75, False
-        ))
-        readings.append(self.get_arm_distance(arm_middle, x, y, angle, 0))
-        readings.append(self.get_arm_distance(
-            arm_right, x, y, angle, -0.75, False
-        ))
-
-        if self.noisey:
-            readings = self.make_sonar_noise(readings)
-
-        if show_sensors:
-            pygame.display.update()
-
-        return readings
-
-    def make_sonar_noise(self, readings):
-        """
-        This attemts to mimic noisey sensors. Because sonar is noisey.
-
-        70% of the time, just return a random reading.
-        """
-        new_readings = []
-        if random.randint(0, 10) > 7:
-            for r in readings:
-                new_readings.append(random.randint(0, 39))
-        else:
-            new_readings = readings
-
-        return new_readings
-
-    def get_arm_distance(self, arm, x, y, angle, offset, sonar=True):
-        """
-        We use this same method for both IR and sonar. Sonar returns a distance
-        while IR just returns a 0 or 1 depending on if it detected something.
-        For sonar, 1 = didn't detect anything, 0 = detected something.
-        """
-        # Used to count the distance.
-        i = 0
-        max_sonar_distance = 5
-
-        # Look at each point and see if we've hit something.
-        for point in arm:
-            i += 1
-
-            if not sonar and i > max_sonar_distance:
-                break
-
-            # Move the point to the right spot.
-            rotated_p = self.get_rotated_point(
-                x, y, point[0], point[1], angle + offset
-            )
-
-            # Check if we've hit something. Return the current i (distance)
-            # if we did.
-            if rotated_p[0] <= 0 or rotated_p[1] <= 0 \
-                    or rotated_p[0] >= width or rotated_p[1] >= height:
-                break  # Distance is the current i.
-            else:
-                obs = screen.get_at(rotated_p)
-                if self.get_track_or_not(obs) != 0:
-                    break  # Distance is the current i.
-
-            if show_sensors:
-                pygame.draw.circle(screen, (255, 255, 255), (rotated_p), 2)
-
-        # Depending on if it's sonar or IR, we return different values.
-        if sonar:
-            return i
-        else:
-            # It's IR.
-            if i <= max_sonar_distance:
-                return 0
-            else:
-                return 1
-
-    def make_sonar_arm(self, x, y):
-        spread = 8  # Default spread.
-        distance = 18  # Gap before first sensor.
-        arm_points = []
-        # Make an arm. We build it flat because we'll rotate it about the
-        # center later.
-        for i in range(1, 40):
-            arm_points.append((distance + x + (spread * i), y))
-
-        return arm_points
-
-    def get_rotated_point(self, x_1, y_1, x_2, y_2, radians):
-        # Rotate x_2, y_2 around x_1, y_1 by angle.
-        x_change = (x_2 - x_1) * math.cos(radians) + \
-            (y_2 - y_1) * math.sin(radians)
-        y_change = (y_1 - y_2) * math.cos(radians) - \
-            (x_1 - x_2) * math.sin(radians)
-        new_x = x_change + x_1
-        new_y = height - (y_change + y_1)
-        return int(new_x), int(new_y)
-
-    def get_track_or_not(self, reading):
-        if reading == THECOLORS['black']:
-            return 0
-        else:
-            return 1
 
 if __name__ == "__main__":
     game_state = GameState()

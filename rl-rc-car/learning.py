@@ -3,13 +3,14 @@ from sim import carmunk
 from statistics import mean
 import csv
 
+# frames = 10000
 frames = 10000
 inputs = 3
 actions = 6
 
 # Just change these.
 train = False
-weights_file = 'saved-models/sonar-and-ir.h5'
+weights_file = 'saved-models/sonar-and-ir-walls.h5'
 
 if train:
     enable_training = True
@@ -27,7 +28,7 @@ network = bechonet.BechoNet(num_actions=actions, num_inputs=inputs,
                             save_weights=save_weights)
 pb = becho.ProjectBecho(network, frames=frames, num_actions=actions,
                         batch_size=50, min_epsilon=0.1, num_inputs=inputs,
-                        replay_size=100000, gamma=0.9, verbose=True,
+                        replay_size=100000, gamma=0.99, verbose=True,
                         enable_training=enable_training,
                         save_steps=750)
 
@@ -46,8 +47,8 @@ for i in range(frames):
     distance += 1
     action = pb.get_action(state)
 
-    print(state, action)
-    input("Press enter.")
+    # print(state, action)
+    # input("Press enter.")
 
     for x in range(repeat_action):
         reward, new_state = game_state.frame_step(action)

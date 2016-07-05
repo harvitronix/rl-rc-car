@@ -27,7 +27,7 @@ def get_reward_from_sensors(car, readings, action):
 
 if __name__ == '__main__':
     train = False
-    weights_file = 'saved-models/sonar-and-ir.h5'
+    weights_file = 'saved-models/sonar-and-ir-walls.h5'
 
     if train:
         enable_training = True
