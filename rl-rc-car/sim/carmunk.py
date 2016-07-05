@@ -62,15 +62,7 @@ class GameState:
             s.color = THECOLORS['red']
         self.space.add(static)
 
-        # Create some obstacles, semi-randomly.
-        # We'll create three and they'll move around to prevent over-fitting.
-        """
-        self.obstacles = []
-        self.obstacles.append(self.create_obstacle(200, 350, 100))
-        self.obstacles.append(self.create_obstacle(700, 200, 125))
-        self.obstacles.append(self.create_obstacle(600, 600, 35))
-        """
-
+        # Create some "walls".
         self.create_circle_box(200, 125, 400, 400)
         self.create_circle_box(0, 550, 800, 650)
         self.create_circle_box(600, 300, 700, 550)
@@ -135,10 +127,6 @@ class GameState:
         self.space.add(self.car_body, self.car_shape)
 
     def frame_step(self, action):
-        # Move obstacles.
-        #if self.num_steps % 100 == 0:
-        #    self.move_obstacles()
-
         # Move cat.
         if self.num_steps % 5 == 0:
             self.move_cat()
@@ -214,15 +202,6 @@ class GameState:
             reward = 2
 
         return reward
-
-    def move_obstacles(self):
-        # Randomly move obstacles around.
-        for obstacle in self.obstacles:
-            speed = random.randint(1, 5)
-            direction = Vec2d(1, 0).rotated(
-                self.car_body.angle + random.randint(-2, 2)
-            )
-            obstacle.velocity = speed * direction
 
     def move_cat(self):
         speed = random.randint(50, 120)
