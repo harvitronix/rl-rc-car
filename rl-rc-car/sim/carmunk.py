@@ -1,6 +1,7 @@
 import random
 import numpy as np
 from sim import sensors
+import sys
 
 import pygame
 from pygame.color import THECOLORS
@@ -63,13 +64,44 @@ class GameState:
 
         # Create some obstacles, semi-randomly.
         # We'll create three and they'll move around to prevent over-fitting.
+        """
         self.obstacles = []
         self.obstacles.append(self.create_obstacle(200, 350, 100))
         self.obstacles.append(self.create_obstacle(700, 200, 125))
         self.obstacles.append(self.create_obstacle(600, 600, 35))
+        """
+
+        self.create_circle_box(200, 125, 400, 400)
+        self.create_circle_box(0, 550, 800, 650)
+        self.create_circle_box(600, 300, 700, 550)
+        self.create_circle_box(550, 0, 1000, 150)
+        self.create_circle_box(850, 275, 1075, 450)
 
         # Create a cat.
         self.create_cat()
+
+    def create_circle_box(self, x1, y1, x2, y2):
+        """
+        Create a box out of circles. We do this ridiculousness because
+        for the life of me I can't figure out how to make a simple box!
+        """
+        # Defaults.
+        radius = 20
+        gap = 0
+
+        # Calculated values.
+        circumference = radius * 2
+        width = x2 - x1
+        height = y2 - y1
+        cols = int(width / (circumference + gap))
+        rows = int(height / (circumference + gap))
+
+        # Build a bunch of circles.
+        for y in range(rows):
+            for x in range(cols):
+                space_x = x1 + (x * (circumference + gap))
+                space_y = y1 + (y * (circumference + gap))
+                self.create_obstacle(space_x, space_y, radius)
 
     def create_obstacle(self, x, y, r):
         c_body = pymunk.Body(pymunk.inf, pymunk.inf)
@@ -104,8 +136,8 @@ class GameState:
 
     def frame_step(self, action):
         # Move obstacles.
-        if self.num_steps % 100 == 0:
-            self.move_obstacles()
+        #if self.num_steps % 100 == 0:
+        #    self.move_obstacles()
 
         # Move cat.
         if self.num_steps % 5 == 0:
