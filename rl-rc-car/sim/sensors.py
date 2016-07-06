@@ -117,7 +117,7 @@ class Sensors:
 
         # Depending on if it's sonar or IR, we return different values.
         if sonar:
-            return i
+            return i * 5  # Try to get the value closer to reality.
         else:
             # It's IR.
             if i <= max_sonar_distance:

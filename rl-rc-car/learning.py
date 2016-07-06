@@ -37,7 +37,7 @@ distances = []
 results = []
 distance = 0
 
-repeat_action = 3
+repeat_action = 1
 
 game_state = carmunk.GameState(noisey=False)
 _, state = game_state.frame_step((2))
@@ -52,6 +52,8 @@ for i in range(frames):
 
     for x in range(repeat_action):
         reward, new_state = game_state.frame_step(action)
+
+    print(new_state)
 
     if enable_training:
         pb.step(state, action, reward, new_state, False)
