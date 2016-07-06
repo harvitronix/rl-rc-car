@@ -5,11 +5,11 @@ import csv
 
 # frames = 10000
 frames = 10000
-inputs = 3
+inputs = 12
 actions = 6
 
 # Just change these.
-train = False
+train = True
 weights_file = 'saved-models/sonar-and-ir-walls.h5'
 
 if train:
@@ -43,17 +43,11 @@ game_state = carmunk.GameState(noisey=False)
 _, state = game_state.frame_step((2))
 
 for i in range(frames):
-
     distance += 1
     action = pb.get_action(state)
 
-    # print(state, action)
-    # input("Press enter.")
-
     for x in range(repeat_action):
         reward, new_state = game_state.frame_step(action)
-
-    print(new_state)
 
     if enable_training:
         pb.step(state, action, reward, new_state, False)

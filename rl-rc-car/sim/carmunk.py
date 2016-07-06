@@ -1,7 +1,7 @@
 import random
 import numpy as np
 from sim import sensors
-import sys
+from collections import deque
 
 import pygame
 from pygame.color import THECOLORS
@@ -71,6 +71,10 @@ class GameState:
 
         # Create a cat.
         self.create_cat()
+
+        # Record multiple frames.
+        self.state_frames = deque([[1, 50, 1], [1, 50, 1], [1, 50, 1], [1, 50, 1]])
+        self.num_frames = 4
 
     def create_circle_box(self, x1, y1, x2, y2):
         """
@@ -179,8 +183,11 @@ class GameState:
         # Show sensors.
         pygame.display.update()
 
+        # Add it to our frames deque.
+        self.add_to_state_frames(readings_arr)
+
         # Numpy it.
-        state = np.array([readings_arr])
+        state = np.array([self.state_frames])
 
         self.num_steps += 1
 
@@ -207,6 +214,11 @@ class GameState:
         self.cat_body.angle -= random.randint(-1, 1)
         direction = Vec2d(1, 0).rotated(self.cat_body.angle)
         self.cat_body.velocity = speed * direction
+
+    def add_to_state_frames(self, readings):
+        if len(self.state_frames) >= self.num_frames:
+            self.state_frames.popleft()
+        self.state_frames.append(readings)
 
 
 if __name__ == "__main__":
