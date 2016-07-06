@@ -9,7 +9,7 @@ actions = 6
 
 # Just change these.
 train = False
-weights_file = 'saved-models/all-five.h5'
+weights_file = 'saved-models/all-five-9700.h5'
 
 if train:
     enable_training = True
