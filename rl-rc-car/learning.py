@@ -3,14 +3,13 @@ from sim import carmunk
 from statistics import mean
 import csv
 
-# frames = 10000
 frames = 10000
-inputs = 12
+inputs = 5 * 4
 actions = 6
 
 # Just change these.
-train = True
-weights_file = 'saved-models/sonar-and-ir-walls.h5'
+train = False
+weights_file = 'saved-models/all-five.h5'
 
 if train:
     enable_training = True
@@ -28,7 +27,7 @@ network = bechonet.BechoNet(num_actions=actions, num_inputs=inputs,
                             save_weights=save_weights)
 pb = becho.ProjectBecho(network, frames=frames, num_actions=actions,
                         batch_size=50, min_epsilon=0.1, num_inputs=inputs,
-                        replay_size=100000, gamma=0.99, verbose=True,
+                        replay_size=100000, gamma=0.9, verbose=True,
                         enable_training=enable_training,
                         save_steps=750)
 
@@ -68,6 +67,10 @@ for i in range(frames):
     if i % 100 == 0 and i > 0 and len(distances) > 0:
         print("%d - Average distance: %.2f" % (i, mean(distances)))
         print("Epsilon: %.5f" % pb.epsilon)
+
+        # Update the save filename so we can look at different points.
+        new_ending = '-' + str(i) + '.h5'
+        network.weights_file = weights_file.replace(".h5", new_ending)
 
 # Save stuff.
 with open('results/loss-log.csv', 'w') as myfile:

@@ -36,6 +36,7 @@ class GameState:
 
         # Create the car.
         self.create_car(100, 100, 0.5)
+        self.driving_direction = 0
 
         # Record steps.
         self.num_steps = 0
@@ -64,7 +65,7 @@ class GameState:
 
         # Create some "walls".
         self.create_circle_box(200, 125, 400, 400)
-        self.create_circle_box(0, 550, 800, 650)
+        self.create_circle_box(0, 525, 800, 650)
         self.create_circle_box(600, 300, 700, 550)
         self.create_circle_box(550, 0, 1000, 150)
         self.create_circle_box(850, 275, 1075, 450)
@@ -73,8 +74,11 @@ class GameState:
         self.create_cat()
 
         # Record multiple frames.
-        self.state_frames = deque([[1, 50, 1], [1, 50, 1], [1, 50, 1], [1, 50, 1]])
         self.num_frames = 4
+        self.state_frames = deque()
+        # Initialize the frame queue.
+        for i in range(self.num_frames):
+            self.state_frames.append([1, 50, 50, 50, 1])
 
     def create_circle_box(self, x1, y1, x2, y2):
         """
@@ -126,8 +130,8 @@ class GameState:
         self.car_shape.color = THECOLORS["green"]
         self.car_shape.elasticity = 1.0
         self.car_body.angle = r
-        driving_direction = Vec2d(1, 0).rotated(self.car_body.angle)
-        self.car_body.apply_impulse(driving_direction)
+        self.driving_direction = Vec2d(1, 0).rotated(self.car_body.angle)
+        self.car_body.apply_impulse(self.driving_direction)
         self.space.add(self.car_body, self.car_shape)
 
     def frame_step(self, action):
@@ -146,21 +150,21 @@ class GameState:
         """
         # Forward or back.
         if 0 <= action <= 2:
-            velocity_m = 50
+            velocity_m = 60
         else:
-            velocity_m = -50
+            velocity_m = -60
 
         # Turning.
         turning = False
         if action == 0 or action == 3:  # Turn right.
-            self.car_body.angle -= .03
+            self.car_body.angle -= .05
             turning = True
         elif action == 1 or action == 4:  # Turn left.
-            self.car_body.angle += .03
+            self.car_body.angle += .05
             turning = True
 
-        driving_direction = Vec2d(1, 0).rotated(self.car_body.angle)
-        self.car_body.velocity = velocity_m * driving_direction
+        self.driving_direction = Vec2d(1, 0).rotated(self.car_body.angle)
+        self.car_body.velocity = velocity_m * self.driving_direction
 
         # Update the screen and stuff.
         screen.fill(THECOLORS["black"])
@@ -194,8 +198,11 @@ class GameState:
         return reward, state
 
     def get_reward(self, readings, velocity, turning):
-        if readings[0] == 0 or readings[2] == 0 or readings[1] < 2:
-            # If one of our sensors touches something...
+        min_distance = 20
+
+        if readings[1] <= min_distance or readings[2] <= min_distance \
+                or readings[3] <= min_distance:
+            # One of our front-facing sensors is very close to something.
             reward = -10
         elif velocity < 0:
             # If we're going backwards, give negative reward.
@@ -205,7 +212,7 @@ class GameState:
             reward = 1
         else:
             # We're going straight.
-            reward = 2
+            reward = 3
 
         return reward
 
