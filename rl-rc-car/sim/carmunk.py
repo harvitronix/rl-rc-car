@@ -73,13 +73,6 @@ class GameState:
         # Create a cat.
         self.create_cat()
 
-        # Record multiple frames.
-        self.num_frames = 4
-        self.state_frames = deque()
-        # Initialize the frame queue.
-        for i in range(self.num_frames):
-            self.state_frames.append([1, 50, 50, 50, 1])
-
     def create_circle_box(self, x1, y1, x2, y2):
         """
         Create a box out of circles. We do this ridiculousness because
@@ -179,29 +172,24 @@ class GameState:
         sensor_obj = sensors.Sensors(x, y, self.car_body.angle, width, height,
                                      screen, pygame)
         sensor_obj.set_readings()
-        readings_arr = sensor_obj.get_readings()
+        proximity_sensors = sensor_obj.get_readings()
+        sonar_sweep = sensor_obj.get_lidar_sweep()
 
         # Set the reward.
-        reward = self.get_reward(readings_arr, velocity_m, turning)
+        reward = self.get_reward(proximity_sensors, velocity_m, turning)
 
         # Show sensors.
         pygame.display.update()
 
-        # Add it to our frames deque.
-        # self.add_to_state_frames(readings_arr)
-
         # Numpy it.
-        state = np.array([readings_arr])
+        state = np.array([sonar_sweep])
 
         self.num_steps += 1
 
         return reward, state
 
     def get_reward(self, readings, velocity, turning):
-        min_distance = 18
-
-        if readings[1] <= min_distance or readings[2] <= min_distance \
-                or readings[3] <= min_distance:
+        if readings[0] == 0 or readings[1] == 0:
             # One of our front-facing sensors is very close to something.
             reward = -500
         elif turning:
@@ -218,11 +206,6 @@ class GameState:
         self.cat_body.angle -= random.randint(-1, 1)
         direction = Vec2d(1, 0).rotated(self.cat_body.angle)
         self.cat_body.velocity = speed * direction
-
-    def add_to_state_frames(self, readings):
-        if len(self.state_frames) >= self.num_frames:
-            self.state_frames.popleft()
-        self.state_frames.append(readings)
 
     def recover(self):
         self.car_body.velocity = -100 * self.driving_direction

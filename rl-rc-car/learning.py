@@ -3,12 +3,12 @@ from sim import carmunk
 import csv
 
 frames = 10000
-inputs = 5
+inputs = 31
 actions = 3
 
 # Just change these.
-train = False
-weights_file = 'saved-models/no-reverse-9700.h5'
+train = True
+weights_file = 'saved-models/servo.h5'
 
 if train:
     enable_training = True

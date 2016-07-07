@@ -20,13 +20,17 @@ class Sensors:
         self.angle = angle
         self.noisey = noisey
         self.sensors = {
-            'l_p': {'angle_diff': 1.5, 'type': 'prox', 'reading:': None},
-            'r_p': {'angle_diff': -1.5, 'type': 'prox', 'reading:': None},
-            'l_d': {'angle_diff': 0.5, 'type': 'sonar', 'reading:': None},
-            'r_d': {'angle_diff': -0.5, 'type': 'sonar', 'reading:': None},
-            'm_s': {'angle_diff': 0, 'type': 'sonar', 'reading:': None},
+            'l_p': {'angle_diff': 0.75, 'type': 'prox', 'reading:': None},
+            'r_p': {'angle_diff': -0.75, 'type': 'prox', 'reading:': None},
+            # 'l_d': {'angle_diff': 0.5, 'type': 'sonar', 'reading:': None},
+            # 'r_d': {'angle_diff': -0.75, 'type': 'sonar', 'reading:': None},
+            # 'm_s': {'angle_diff': 0, 'type': 'sonar', 'reading:': None},
         }
         self.arm = self.make_sensor_arm(self.x, self.y)
+
+        self.sweep_offsets = []
+        for i in range(31):
+            self.sweep_offsets.append(-1.5 + i * 0.1)
 
     def set_readings(self):
         for key, value in self.sensors.items():
@@ -49,7 +53,7 @@ class Sensors:
         """
         state = []
         # s_order = ['l_p', 'l_d', 'm_s', 'r_d', 'r_p']
-        s_order = ['l_p', 'l_d', 'm_s', 'r_d', 'r_p']
+        s_order = ['l_p', 'r_p']
         for i in s_order:
             state.append(self.sensors[i]['reading'])
         return state
@@ -87,7 +91,7 @@ class Sensors:
 
         # Used to count the distance.
         i = 0
-        max_sonar_distance = 5
+        max_sonar_distance = 2
 
         # Look at each point and see if we've hit something.
         for point in arm:
@@ -147,7 +151,15 @@ class Sensors:
         return int(new_x), int(new_y)
 
     def get_track_or_not(self, reading):
-        if reading == THECOLORS['black']:
+        if reading == THECOLORS['black'] or reading == THECOLORS['white']:
             return 0
         else:
             return 1
+
+    def get_lidar_sweep(self):
+        readings = []
+        for o in self.sweep_offsets:
+            readings.append(self.get_sensor_reading(self.arm, self.x, self.y,
+                                                    self.angle, o,
+                                                    s_type='sonar'))
+        return readings
