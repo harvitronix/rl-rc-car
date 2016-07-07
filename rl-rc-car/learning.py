@@ -1,6 +1,7 @@
 from becho import becho, bechonet
 from sim import carmunk
 import csv
+from vis import visualize_sensors
 
 frames = 10000
 inputs = 31
@@ -9,6 +10,7 @@ actions = 3
 # Just change these.
 train = True
 weights_file = 'saved-models/servo.h5'
+visualize = True
 
 if train:
     enable_training = True
@@ -46,6 +48,9 @@ for i in range(frames):
 
     for x in range(repeat_action):
         reward, new_state = game_state.frame_step(action)
+
+    if visualize and i % 5 == 0:
+        visualize_sensors(new_state)
 
     # Mimic terminal for reporting.
     if reward == -500:
