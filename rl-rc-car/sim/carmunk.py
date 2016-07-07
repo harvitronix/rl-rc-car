@@ -150,9 +150,9 @@ class GameState:
         """
         # Forward or back.
         if 0 <= action <= 2:
-            velocity_m = 60
+            velocity_m = 50
         else:
-            velocity_m = -60
+            velocity_m = -50
 
         # Turning.
         turning = False
@@ -188,31 +188,28 @@ class GameState:
         pygame.display.update()
 
         # Add it to our frames deque.
-        self.add_to_state_frames(readings_arr)
+        # self.add_to_state_frames(readings_arr)
 
         # Numpy it.
-        state = np.array([self.state_frames])
+        state = np.array([readings_arr])
 
         self.num_steps += 1
 
         return reward, state
 
     def get_reward(self, readings, velocity, turning):
-        min_distance = 20
+        min_distance = 18
 
         if readings[1] <= min_distance or readings[2] <= min_distance \
                 or readings[3] <= min_distance:
             # One of our front-facing sensors is very close to something.
-            reward = -10
-        elif velocity < 0:
-            # If we're going backwards, give negative reward.
-            reward = -2
+            reward = -500
         elif turning:
             # Less reward if turning.
-            reward = 1
+            reward = 0
         else:
             # We're going straight.
-            reward = 3
+            reward = 1
 
         return reward
 
@@ -226,6 +223,17 @@ class GameState:
         if len(self.state_frames) >= self.num_frames:
             self.state_frames.popleft()
         self.state_frames.append(readings)
+
+    def recover(self):
+        self.car_body.velocity = -100 * self.driving_direction
+        for i in range(3):
+            self.car_body.angle += .2  # Turn a little.
+            screen.fill(THECOLORS["coral"])
+            draw(screen, self.space)
+            self.space.step(1./10)
+            if draw_screen:
+                pygame.display.flip()
+            clock.tick()
 
 
 if __name__ == "__main__":
