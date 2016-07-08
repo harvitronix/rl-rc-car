@@ -9,15 +9,15 @@ from pygame.color import THECOLORS
 
 class Sensors:
     """Make the sensors we need. This is basically hard-coded for now."""
-    def __init__(self, x, y, angle, width,
-                 height, screen, pygame, noisey=False):
-        self.x = x
-        self.y = y
+    def __init__(self, width, height, screen, pygame, noisey=False):
+        self.x = None
+        self.y = None
+        self.arm = None
+        self.angle = None
         self.width = width
         self.height = height
         self.screen = screen
         self.pygame = pygame
-        self.angle = angle
         self.noisey = noisey
         self.sensors = {
             'l_p': {'angle_diff': 0.75, 'type': 'prox', 'reading:': None},
@@ -26,13 +26,22 @@ class Sensors:
             # 'r_d': {'angle_diff': -0.75, 'type': 'sonar', 'reading:': None},
             # 'm_s': {'angle_diff': 0, 'type': 'sonar', 'reading:': None},
         }
-        self.arm = self.make_sensor_arm(self.x, self.y)
 
         self.sweep_offsets = []
+        self.sweep_readings = []
         for i in range(16):
+            # Get our angles.
             self.sweep_offsets.append(-1.5 + i * 0.2)
+            # Set initial readings.
+            self.sweep_readings.append(100)
 
-    def set_readings(self):
+    def set_readings(self, x, y, angle):
+        self.x = x
+        self.y = y
+        self.angle = angle
+        self.arm = self.make_sensor_arm(self.x, self.y)
+
+        # For our proximity and sonar sensors, make and set readings.
         for key, value in self.sensors.items():
             reading = self.get_sensor_reading(
                 self.arm, self.x, self.y, self.angle,
@@ -45,25 +54,22 @@ class Sensors:
 
             self.sensors[key]['reading'] = reading
 
-        return self.sensors
+        # Now set our sonar sweep readings.
+        self.set_sonar_sweep()
 
     def get_readings(self):
         """
         Makes a usable "state". Hard coded. :(
         """
-        state = []
+        readings = []
         # s_order = ['l_p', 'l_d', 'm_s', 'r_d', 'r_p']
         s_order = ['l_p', 'r_p']
         for i in s_order:
-            state.append(self.sensors[i]['reading'])
-        return state
+            readings.append(self.sensors[i]['reading'])
+        return readings
 
-    def proximity_alert(self):
-        for r in self.readings:
-            if r < 1:
-                return True
-        else:
-            return False
+    def get_sonar_sweep_readings(self):
+        return self.sweep_readings
 
     def make_sonar_noise(self, reading):
         """
@@ -131,7 +137,7 @@ class Sensors:
 
     def make_sensor_arm(self, x, y):
         spread = 8  # Default spread.
-        distance = 18  # Gap before first sensor.
+        distance = 10  # Gap before first sensor.
         arm_points = []
         # Make an arm. We build it flat because we'll rotate it about the
         # center later.
@@ -156,10 +162,9 @@ class Sensors:
         else:
             return 1
 
-    def get_sonar_sweep(self):
-        readings = []
-        for o in self.sweep_offsets:
-            readings.append(self.get_sensor_reading(self.arm, self.x, self.y,
-                                                    self.angle, o,
-                                                    s_type='sonar'))
-        return readings
+    def set_sonar_sweep(self):
+        for i, o in enumerate(self.sweep_offsets):
+            self.sweep_readings[i] = self.get_sensor_reading(self.arm,
+                                                             self.x, self.y,
+                                                             self.angle, o,
+                                                             s_type='sonar')
