@@ -10,7 +10,7 @@ actions = 3
 # Just change these.
 train = True
 weights_file = 'saved-models/servo.h5'
-visualize = False
+visualize = True
 
 if train:
     enable_training = True

@@ -27,6 +27,8 @@ class Sensors:
             # 'm_s': {'angle_diff': 0, 'type': 'sonar', 'reading:': None},
         }
 
+        self.sweep_position = 0
+        self.sweep_direction = 0
         self.sweep_offsets = []
         self.sweep_readings = []
         for i in range(16):
@@ -163,8 +165,23 @@ class Sensors:
             return 1
 
     def set_sonar_sweep(self):
-        for i, o in enumerate(self.sweep_offsets):
-            self.sweep_readings[i] = self.get_sensor_reading(self.arm,
-                                                             self.x, self.y,
-                                                             self.angle, o,
-                                                             s_type='sonar')
+        so = self.sweep_offsets[self.sweep_position]
+        self.sweep_readings[self.sweep_position] = \
+            self.get_sensor_reading(self.arm,
+                                    self.x, self.y,
+                                    self.angle, so,
+                                    s_type='sonar')
+
+        # Figure out the next position.
+        if self.sweep_direction == 0:
+            if self.sweep_position < len(self.sweep_offsets) - 1:
+                self.sweep_position += 1
+            else:
+                self.sweep_direction = 1
+                self.sweep_position -= 1
+        else:
+            if self.sweep_position > 0:
+                self.sweep_position -= 1
+            else:
+                self.sweep_direction = 0
+                self.sweep_position += 1

@@ -73,7 +73,7 @@ class GameState:
         self.create_cat()
 
         # Initialize our sensors.
-        self.sensor_obj = sensors.Sensors(width, height, screen, pygame)
+        self.sensor_obj = sensors.Sensors(width, height, screen, pygame, False)
 
     def create_circle_box(self, x1, y1, x2, y2):
         """
@@ -201,7 +201,7 @@ class GameState:
                 self.car_body.angle += .2  # Turn a little.
             else:
                 self.car_body.angle -= .2  # Turn a little.
-            screen.fill(THECOLORS["coral"])
+            # screen.fill(THECOLORS["coral"])
             draw(screen, self.space)
             self.space.step(1./10)
             if draw_screen:
