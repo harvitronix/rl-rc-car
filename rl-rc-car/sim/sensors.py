@@ -29,8 +29,8 @@ class Sensors:
         self.arm = self.make_sensor_arm(self.x, self.y)
 
         self.sweep_offsets = []
-        for i in range(31):
-            self.sweep_offsets.append(-1.5 + i * 0.1)
+        for i in range(16):
+            self.sweep_offsets.append(-1.5 + i * 0.2)
 
     def set_readings(self):
         for key, value in self.sensors.items():
@@ -156,7 +156,7 @@ class Sensors:
         else:
             return 1
 
-    def get_lidar_sweep(self):
+    def get_sonar_sweep(self):
         readings = []
         for o in self.sweep_offsets:
             readings.append(self.get_sensor_reading(self.arm, self.x, self.y,

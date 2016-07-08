@@ -3,14 +3,14 @@ from sim import carmunk
 import csv
 from vis import visualize_sensors
 
-frames = 10000
-inputs = 31
+frames = 20000
+inputs = 16
 actions = 3
 
 # Just change these.
 train = True
 weights_file = 'saved-models/servo.h5'
-visualize = True
+visualize = False
 
 if train:
     enable_training = True
@@ -22,7 +22,7 @@ else:
     save_weights = False
 
 network = bechonet.BechoNet(num_actions=actions, num_inputs=inputs,
-                            nodes_1=512, nodes_2=512, verbose=True,
+                            nodes_1=1024, nodes_2=1024, verbose=True,
                             load_weights=load_weights,
                             weights_file=weights_file,
                             save_weights=save_weights)
@@ -46,11 +46,12 @@ for i in range(frames):
     distance += 1
     action = pb.get_action(state)
 
+    # Let's see what the robocar sees.
+    if visualize:
+        visualize_sensors(state)
+
     for x in range(repeat_action):
         reward, new_state = game_state.frame_step(action)
-
-    if visualize and i % 5 == 0:
-        visualize_sensors(new_state)
 
     # Mimic terminal for reporting.
     if reward == -500:

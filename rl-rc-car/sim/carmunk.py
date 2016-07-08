@@ -35,7 +35,7 @@ class GameState:
         self.space.gravity = pymunk.Vec2d(0., 0.)
 
         # Create the car.
-        self.create_car(100, 100, 0.5)
+        self.create_car(100, 100, -0.75)
         self.driving_direction = 0
 
         # Record steps.
@@ -173,7 +173,7 @@ class GameState:
                                      screen, pygame)
         sensor_obj.set_readings()
         proximity_sensors = sensor_obj.get_readings()
-        sonar_sweep = sensor_obj.get_lidar_sweep()
+        sonar_sweep = sensor_obj.get_sonar_sweep()
 
         # Set the reward.
         reward = self.get_reward(proximity_sensors, velocity_m, turning)
@@ -209,8 +209,11 @@ class GameState:
 
     def recover(self):
         self.car_body.velocity = -100 * self.driving_direction
-        for i in range(3):
-            self.car_body.angle += .2  # Turn a little.
+        for i in range(4):
+            if random.randint(0, 1) == 0:
+                self.car_body.angle += .2  # Turn a little.
+            else:
+                self.car_body.angle -= .2  # Turn a little.
             screen.fill(THECOLORS["coral"])
             draw(screen, self.space)
             self.space.step(1./10)
