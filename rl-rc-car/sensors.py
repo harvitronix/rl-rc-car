@@ -198,4 +198,3 @@ if __name__ == '__main__':
         sensors.write_readings()
         # Print just so we can see.
         print(sensors.read_readings())
-        time.sleep(0.1)
