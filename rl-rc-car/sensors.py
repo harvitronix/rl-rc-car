@@ -139,5 +139,4 @@ if __name__ == '__main__':
     sensors = Sensors(ir_pins, sonar_pins)
     for i in range(100):
         print(sensors.get_all_readings())
-        time.sleep(2)
     sensors.cleanup_gpio()
