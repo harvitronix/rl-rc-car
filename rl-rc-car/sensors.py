@@ -190,5 +190,5 @@ if __name__ == '__main__':
         # Write the dict to Mongo.
         sensors.write_readings()
         # Print just so we can see.
-        print(sensors.get_all_readings())
+        print(sensors.read_readings())
         time.sleep(2)
