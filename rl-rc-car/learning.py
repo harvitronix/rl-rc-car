@@ -3,7 +3,7 @@ from sim import carmunk
 import csv
 from vis import visualize_sensors
 
-frames = 20000
+frames = 10000
 inputs = 17
 actions = 3
 
@@ -54,7 +54,7 @@ for i in range(frames):
         reward, new_state = game_state.frame_step(action)
 
     # Mimic terminal for reporting.
-    if reward == -500:
+    if reward == -1000:
         terminal = True
         game_state.recover()
         print("Proximity alert at frame %d." % i)

@@ -172,6 +172,7 @@ class GameState:
         # Get the sonar sweep reading.
         sonar_sweep = self.sensor_obj.get_sonar_sweep_readings()
 
+        # State is sweep reading + middle sonar.
         state = sonar_sweep + [forward_sonar]
 
         # Set the reward.
@@ -190,13 +191,13 @@ class GameState:
     def get_reward(self, readings, turning):
         if readings[0] == 0 or readings[1] == 0:
             # One of our front-facing sensors is very close to something.
-            reward = -500
+            reward = -1000
         elif turning:
             # Less reward if turning.
             reward = 0
         else:
             # We're going straight.
-            reward = 1
+            reward = 2
 
         return reward
 
@@ -209,10 +210,7 @@ class GameState:
     def recover(self):
         self.car_body.velocity = -100 * self.driving_direction
         for i in range(4):
-            if random.randint(0, 1) == 0:
-                self.car_body.angle += .2  # Turn a little.
-            else:
-                self.car_body.angle -= .2  # Turn a little.
+            self.car_body.angle += .2  # Turn a little.
             screen.fill(THECOLORS["black"])
             draw(screen, self.space)
             self.space.step(1./10)

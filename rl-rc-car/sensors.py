@@ -11,6 +11,7 @@ Example: sonar_pins = [[24, 25], [28, 29]]
 import RPi.GPIO as gpio
 import time
 from statistics import median
+import serial
 
 
 class SonarSensor:
@@ -67,6 +68,18 @@ class IRSensor:
         return gpio.input(self.in_p)
 
 
+class IRDistance:
+    """
+    Read it from Arduino because it's analog.
+    """
+    def __init(self, path='/dev/tty.usbmodemFD131', baud=9600):
+        self.ser = serial.Serial(path, baud)
+        print("Initialized an IR distance sensor at %s " % path)
+
+    def get_reading(self):
+        return self.ser.readline().decode("utf-8").rstrip()
+
+
 class Sensors:
     """
     While the above classes are general to the sensor, this class is used
@@ -90,6 +103,9 @@ class Sensors:
             for sonar in self.sonar_pins:
                 self.sonars.append(SonarSensor(sonar[1], sonar[0]))
 
+        # Initialize our IR sensor on the servo.
+        self.ir_sweep = IRDistance()
+
         # Wait for sensors to settle.
         print("Initializing sensors.")
         time.sleep(2)
@@ -102,11 +118,12 @@ class Sensors:
         ir_reading_l = self.irs[0].get_reading()
         ir_reading_r = self.irs[1].get_reading()
         sonar_reading = self.sonars[0].get_reading()
+        ir_reading = self.ir_sweep.get_reading()
 
         # Limit distance returned.
         sonar_reading = 90 if sonar_reading > 90 else sonar_reading
 
-        return [ir_reading_l, int(sonar_reading), ir_reading_r]
+        return [ir_reading_l, int(sonar_reading), ir_reading_r, ir_reading]
 
     def cleanup_gpio(self):
         gpio.cleanup()
