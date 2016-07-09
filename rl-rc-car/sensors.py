@@ -151,7 +151,8 @@ class Sensors:
         splitup = reading.split('|')
         angle = int(splitup[0])
         distance = int(splitup[1])
-        index = angle / 12
+        index = int(angle / 12)
+        print(index)
         new_values = self.readings['ir_s'][:]
         new_values[index] = distance
         print(new_values)
