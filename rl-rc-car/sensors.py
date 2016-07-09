@@ -158,7 +158,7 @@ class Sensors:
         distance = int(splitup[1])
 
         # Change the angle into an index.
-        index = int(angle / 12)
+        index = 0 if angle == 0 else int(angle / 12)
 
         # Get the old array and update the index at this angle.
         new_values = self.readings['ir_s'][:]
