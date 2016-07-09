@@ -14,7 +14,7 @@ import time
 from statistics import median
 import serial
 import sys
-from pymongo import MongoClient
+import json
 
 
 class SonarSensor:
@@ -128,15 +128,6 @@ class Sensors:
             'ir_s': [x for x in range(16)],
         }
 
-        # Set us up with Mongo so we can store and update our dict.
-        client = MongoClient('localhost')
-        self.db = client.robocar
-        # Remove old ones.
-        self.db.readings.delete_many({})
-        # Insert a new one.
-        result = self.db.readings.insert_one(self.readings)
-        self.mongo_id = result.inserted_id
-
     def set_all_readings(self):
         """
         This is specific to how we need the readings. Should be generalized.
@@ -179,9 +170,12 @@ class Sensors:
         return self.readings
 
     def write_readings(self):
-        self.db.readings.replace_one({'_id': self.mongo_id},
-                                     {"$set": self.readings},
-                                     upsert=False)
+        with open('readings.json', 'w') as f:
+            json.dump(self.readings, f)
+
+    def read_readings(self):
+        with open('readings.json') as f:
+            return json.load(f)
 
 
 if __name__ == '__main__':
