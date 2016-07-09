@@ -168,5 +168,6 @@ if __name__ == '__main__':
 
     sensors = Sensors(ir_pins, sonar_pins)
     while True:
-        readings = sensors.get_all_readings()
+        sensors.set_all_readings()
+        print(sensors.get_all_readings())
         time.sleep(2)
