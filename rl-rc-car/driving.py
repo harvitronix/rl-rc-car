@@ -29,6 +29,9 @@ if __name__ == '__main__':
     train = False
     weights_file = 'saved-models/sonar-and-ir-walls.h5'
 
+    inputs = 17
+    actions = 3
+
     if train:
         enable_training = True
         load_weights = False
@@ -39,14 +42,14 @@ if __name__ == '__main__':
         save_weights = False
 
     network = bechonet.BechoNet(
-        num_actions=6, num_inputs=3,
+        num_actions=actions, num_inputs=inputs,
         nodes_1=256, nodes_2=256, verbose=True,
         load_weights=load_weights,
         weights_file=weights_file,
         save_weights=save_weights
     )
     pb = becho.ProjectBecho(
-        network, num_actions=6, num_inputs=3,
+        network, num_actions=actions, num_inputs=inputs,
         verbose=True, enable_training=enable_training,
         batch_size=50, min_epsilon=0.05, epsilon=0.05,
         replay_size=100000, gamma=0.9, save_steps=100

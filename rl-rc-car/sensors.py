@@ -142,7 +142,7 @@ class Sensors:
 
         self.readings['ir_l'] = ir_reading_l
         self.readings['ir_r'] = ir_reading_r
-        self.readings['s_m'] = sonar_reading
+        self.readings['s_m'] = int(sonar_reading)
         self.readings['ir_s'] = self.update_sweep(ir_distance_reading)
 
     def cleanup_gpio(self):
@@ -194,10 +194,14 @@ if __name__ == '__main__':
     sonar_pins = [[25, 8]]
 
     sensors = Sensors(ir_pins, sonar_pins)
+    i = 0
     while True:
+        i += 1
         # Take readings and store them in a dict.
         sensors.set_all_readings()
-        # Write the dict to Mongo.
+        # Write the dict to file.
         sensors.write_readings()
         # Print just so we can see.
-        print(sensors.read_readings())
+        if i % 50 == 0:
+            print(sensors.read_readings())
+            i = 0
