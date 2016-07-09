@@ -125,7 +125,7 @@ class Sensors:
             'ir_l': 1,
             'ir_r': 1,
             's_m': 100,
-            'ir_s': [x for x in range(16)],
+            'ir_s': [100 for x in range(16)],
         }
 
     def set_all_readings(self):
@@ -168,6 +168,8 @@ class Sensors:
 
             # Update the value at the index.
             new_values[index] = distance
+        else:
+            print(reading)
 
         return new_values
 
