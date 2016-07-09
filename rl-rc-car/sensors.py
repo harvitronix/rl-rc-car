@@ -155,7 +155,8 @@ class Sensors:
         # The reading we get from Arduino is in format "X|Y" where
         # X = the angle and Y = the distance.
         splitup = reading.split('|')
-        if isinstance(splitup, list) and len(splitup) == 2:
+        if isinstance(splitup, list) and len(splitup) == 2 and \
+                splitup[0] is not None and splitup[1] is not None:
             # Get the parts.
             angle = int(splitup[0])
             distance = int(splitup[1])
