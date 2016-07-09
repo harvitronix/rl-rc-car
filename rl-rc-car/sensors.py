@@ -73,7 +73,7 @@ class IRDistance:
     """
     Read it from Arduino because it's analog.
     """
-    def __init(self, path='/dev/tty.usbmodemFD131', baud=9600):
+    def __init__(self, path='/dev/tty.usbmodemFD131', baud=9600):
         self.ser = serial.Serial(path, baud)
         print("Initialized an IR distance sensor at %s " % path)
 
