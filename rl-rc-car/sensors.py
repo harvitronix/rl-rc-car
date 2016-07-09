@@ -149,22 +149,25 @@ class Sensors:
         gpio.cleanup()
 
     def update_sweep(self, reading):
+        # Copy the old value.
+        new_values = self.readings['ir_s'][:]
+
         # The reading we get from Arduino is in format "X|Y" where
         # X = the angle and Y = the distance.
-        splitup = reading.split('|')
-        print(splitup)
-        # Get the parts.
-        angle = int(splitup[0])
-        distance = int(splitup[1])
+        if isinstance(reading, list):
+            splitup = reading.split('|')
+            print(splitup)
+            # Get the parts.
+            angle = int(splitup[0])
+            distance = int(splitup[1])
 
-        # Change the angle into an index.
-        index = 0 if angle == 0 else int(angle / 12)
+            # Change the angle into an index.
+            index = 0 if angle == 0 else int(angle / 12)
 
-        print(angle,distance,index)
+            print(angle,distance,index)
 
-        # Get the old array and update the index at this angle.
-        new_values = self.readings['ir_s'][:]
-        new_values[index] = distance
+            # Update the value at the index.
+            new_values[index] = distance
 
         return new_values
 
