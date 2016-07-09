@@ -156,7 +156,7 @@ class Sensors:
         # X = the angle and Y = the distance.
         splitup = reading.split('|')
         if isinstance(splitup, list) and len(splitup) == 2 and \
-                splitup[0] is not None and splitup[1] is not None:
+                splitup[0] is not '' and splitup[1] is not '':
             # Get the parts.
             print(splitup)
             angle = int(splitup[0])
