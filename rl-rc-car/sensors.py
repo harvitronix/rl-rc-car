@@ -158,6 +158,7 @@ class Sensors:
         if isinstance(splitup, list) and len(splitup) == 2 and \
                 splitup[0] is not None and splitup[1] is not None:
             # Get the parts.
+            print(splitup)
             angle = int(splitup[0])
             distance = int(splitup[1])
 
