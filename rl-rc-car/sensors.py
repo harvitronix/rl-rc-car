@@ -14,6 +14,7 @@ import time
 from statistics import median
 import serial
 import sys
+from pymongo import MongoClient
 
 
 class SonarSensor:
@@ -127,6 +128,15 @@ class Sensors:
             'ir_s': [x for x in range(16)],
         }
 
+        # Set us up with Mongo so we can store and update our dict.
+        client = MongoClient('localhost')
+        self.db = client.robocar
+        # Remove old ones.
+        self.db.readings.delete_many({})
+        # Insert a new one.
+        result = self.db.readings.insert_one(self.readings)
+        self.mongo_id = result.inserted_id
+
     def set_all_readings(self):
         """
         This is specific to how we need the readings. Should be generalized.
@@ -148,18 +158,30 @@ class Sensors:
         gpio.cleanup()
 
     def update_sweep(self, reading):
+        # The reading we get from Arduino is in format "X|Y" where
+        # X = the angle and Y = the distance.
         splitup = reading.split('|')
+
+        # Get the parts.
         angle = int(splitup[0])
         distance = int(splitup[1])
+
+        # Change the angle into an index.
         index = int(angle / 12)
-        print(index)
+
+        # Get the old array and update the index at this angle.
         new_values = self.readings['ir_s'][:]
         new_values[index] = distance
-        print(new_values)
+
         return new_values
 
     def get_all_readings(self):
         return self.readings
+
+    def write_readings(self):
+        self.db.readings.replace_one({'_id': self.mongo_id},
+                                     {"$set": self.readings},
+                                     upsert=False)
 
 
 if __name__ == '__main__':
@@ -169,6 +191,10 @@ if __name__ == '__main__':
 
     sensors = Sensors(ir_pins, sonar_pins)
     while True:
+        # Take readings and store them in a dict.
         sensors.set_all_readings()
+        # Write the dict to Mongo.
+        sensors.write_readings()
+        # Print just so we can see.
         print(sensors.get_all_readings())
         time.sleep(2)
