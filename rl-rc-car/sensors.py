@@ -154,8 +154,8 @@ class Sensors:
 
         # The reading we get from Arduino is in format "X|Y" where
         # X = the angle and Y = the distance.
-        if isinstance(reading, list):
-            splitup = reading.split('|')
+        splitup = reading.split('|')
+        if isinstance(splitup, list):
             print(splitup)
             # Get the parts.
             angle = int(splitup[0])
@@ -169,7 +169,7 @@ class Sensors:
             # Update the value at the index.
             new_values[index] = distance
         else:
-            print(reading)
+            print(splitup)
 
         return new_values
 
