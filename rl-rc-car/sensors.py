@@ -13,6 +13,7 @@ import RPi.GPIO as gpio
 import time
 from statistics import median
 import serial
+import sys
 
 
 class SonarSensor:
@@ -84,7 +85,7 @@ class IRDistance:
 class Sensors:
     """
     While the above classes are general to the sensor, this class is used
-    specifically to get the three sensors we use on Robocar.
+    specifically to get the sensors we use on Robocar.
     """
     def __init__(self, ir_pins, sonar_pins):
         self.ir_pins = ir_pins
@@ -105,30 +106,59 @@ class Sensors:
                 self.sonars.append(SonarSensor(sonar[1], sonar[0]))
 
         # Initialize our IR sensor on the servo.
-        self.ir_sweep = IRDistance(path='/dev/ttyACM0')
+        a_path = '/dev/ttyACM0'
+        try:
+            self.ir_sweep = IRDistance(path=a_path)
+        except:
+            print("Couldn't find an Arduino at %s" % a_path)
+            print("Exiting.")
+            sys.exit(0)
 
         # Wait for sensors to settle.
         print("Initializing sensors.")
         time.sleep(2)
         print("Ready.")
 
-    def get_all_readings(self):
+        # To store readings we'll retrieve from the server.
+        self.readings = {
+            'ir_l': 1,
+            'ir_r': 1,
+            's_m': 100,
+            'ir_s': [x for x in range(16)],
+        }
+
+    def set_all_readings(self):
         """
         This is specific to how we need the readings. Should be generalized.
         """
         ir_reading_l = self.irs[0].get_reading()
         ir_reading_r = self.irs[1].get_reading()
         sonar_reading = self.sonars[0].get_reading()
-        ir_sweep_reading = self.ir_sweep.get_reading()
+        ir_distance_reading = self.ir_sweep.get_reading()
 
         # Limit distance returned.
         sonar_reading = 90 if sonar_reading > 90 else sonar_reading
 
-        return [ir_reading_l, int(sonar_reading),
-                ir_reading_r, ir_sweep_reading]
+        self.readings['ir_l'] = ir_reading_l
+        self.readings['ir_r'] = ir_reading_r
+        self.readings['s_m'] = sonar_reading
+        self.readings['ir_s'] = self.update_sweep(ir_distance_reading)
 
     def cleanup_gpio(self):
         gpio.cleanup()
+
+    def update_sweep(self, reading):
+        splitup = reading.split('|')
+        angle = int(splitup[0])
+        distance = int(splitup[1])
+        index = angle / 12
+        new_values = self.readings['ir_s'][:]
+        new_values[index] = distance
+        print(new_values)
+        return new_values
+
+    def get_all_readings(self):
+        return self.readings
 
 
 if __name__ == '__main__':
@@ -137,6 +167,6 @@ if __name__ == '__main__':
     sonar_pins = [[25, 8]]
 
     sensors = Sensors(ir_pins, sonar_pins)
-    for i in range(100):
-        print(sensors.get_all_readings())
-    sensors.cleanup_gpio()
+    while True:
+        readings = sensors.get_all_readings()
+        time.sleep(2)
