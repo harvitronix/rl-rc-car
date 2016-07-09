@@ -159,8 +159,20 @@ class GameState:
 
         # Set and get our sensor readings.
         self.sensor_obj.set_readings(x, y, self.car_body.angle)
+
+        # Get readings.
         proximity_sensors = self.sensor_obj.get_readings()
+
+        # The 3rd list item is the middle sonar.
+        forward_sonar = proximity_sensors[2]
+
+        # Now set the proximity sensors.
+        proximity_sensors = proximity_sensors[0:2]
+
+        # Get the sonar sweep reading.
         sonar_sweep = self.sensor_obj.get_sonar_sweep_readings()
+
+        state = sonar_sweep + [forward_sonar]
 
         # Set the reward.
         reward = self.get_reward(proximity_sensors, turning)
@@ -169,7 +181,7 @@ class GameState:
         pygame.display.update()
 
         # Numpy it.
-        state = np.array([sonar_sweep])
+        state = np.array([state])
 
         self.num_steps += 1
 
@@ -201,7 +213,7 @@ class GameState:
                 self.car_body.angle += .2  # Turn a little.
             else:
                 self.car_body.angle -= .2  # Turn a little.
-            # screen.fill(THECOLORS["coral"])
+            screen.fill(THECOLORS["black"])
             draw(screen, self.space)
             self.space.step(1./10)
             if draw_screen:

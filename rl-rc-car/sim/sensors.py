@@ -24,7 +24,7 @@ class Sensors:
             'r_p': {'angle_diff': -0.75, 'type': 'prox', 'reading:': None},
             # 'l_d': {'angle_diff': 0.5, 'type': 'sonar', 'reading:': None},
             # 'r_d': {'angle_diff': -0.75, 'type': 'sonar', 'reading:': None},
-            # 'm_s': {'angle_diff': 0, 'type': 'sonar', 'reading:': None},
+            'm_s': {'angle_diff': 0, 'type': 'sonar', 'reading:': None},
         }
 
         self.sweep_position = 0
@@ -65,7 +65,7 @@ class Sensors:
         """
         readings = []
         # s_order = ['l_p', 'l_d', 'm_s', 'r_d', 'r_p']
-        s_order = ['l_p', 'r_p']
+        s_order = ['l_p', 'r_p', 'm_s']
         for i in s_order:
             readings.append(self.sensors[i]['reading'])
         return readings
@@ -165,6 +165,7 @@ class Sensors:
             return 1
 
     def set_sonar_sweep(self):
+        # Get the reading at the current offset.
         so = self.sweep_offsets[self.sweep_position]
         self.sweep_readings[self.sweep_position] = \
             self.get_sensor_reading(self.arm,
@@ -172,7 +173,7 @@ class Sensors:
                                     self.angle, so,
                                     s_type='sonar')
 
-        # Figure out the next position.
+        # Figure out the next position so it actually sweeps.
         if self.sweep_direction == 0:
             if self.sweep_position < len(self.sweep_offsets) - 1:
                 self.sweep_position += 1

@@ -14,9 +14,7 @@ def visualize_sensors(state):
     row = state[0][::-1]
 
     # Make a 2d list.
-    cols = []
-    for i in range(31):
-        cols.append(row)
+    cols = [row]
 
     # Plot it.
     sns.heatmap(data=cols, cmap="Blues_r", yticklabels=False)

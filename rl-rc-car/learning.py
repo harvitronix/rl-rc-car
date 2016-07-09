@@ -4,13 +4,13 @@ import csv
 from vis import visualize_sensors
 
 frames = 20000
-inputs = 16
+inputs = 17
 actions = 3
 
 # Just change these.
 train = True
 weights_file = 'saved-models/servo.h5'
-visualize = True
+visualize = False
 
 if train:
     enable_training = True
@@ -27,7 +27,7 @@ network = bechonet.BechoNet(num_actions=actions, num_inputs=inputs,
                             weights_file=weights_file,
                             save_weights=save_weights)
 pb = becho.ProjectBecho(network, frames=frames, num_actions=actions,
-                        batch_size=100, min_epsilon=0.1, num_inputs=inputs,
+                        batch_size=32, min_epsilon=0.1, num_inputs=inputs,
                         replay_size=10000, gamma=0.9, verbose=True,
                         enable_training=enable_training,
                         save_steps=750)
