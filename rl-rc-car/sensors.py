@@ -155,8 +155,7 @@ class Sensors:
         # The reading we get from Arduino is in format "X|Y" where
         # X = the angle and Y = the distance.
         splitup = reading.split('|')
-        if isinstance(splitup, list):
-            print(splitup)
+        if isinstance(splitup, list) and len(splitup) == 2:
             # Get the parts.
             angle = int(splitup[0])
             distance = int(splitup[1])
@@ -164,11 +163,10 @@ class Sensors:
             # Change the angle into an index.
             index = 0 if angle == 0 else int(angle / 12)
 
-            print(angle,distance,index)
-
             # Update the value at the index.
             new_values[index] = distance
         else:
+            print('Error reading from IR distance sensor. Received:')
             print(splitup)
 
         return new_values
@@ -198,4 +196,4 @@ if __name__ == '__main__':
         sensors.write_readings()
         # Print just so we can see.
         print(sensors.read_readings())
-        time.sleep(2)
+        time.sleep(0.1)
