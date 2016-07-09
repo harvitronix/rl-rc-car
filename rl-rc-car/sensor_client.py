@@ -53,15 +53,18 @@ if __name__ == '__main__':
 
     while True:
         # Get the reading.
-        readings = sensors.get_readings()
-        proximity = True if readings['ir_l'] == 0 or \
-            readings['ir_r'] == 0 else False
-        state = np.array([readings['state']])
-        print(proximity, state)
+        try:
+            readings = sensors.get_readings()
+            proximity = True if readings['ir_l'] == 0 or \
+                readings['ir_r'] == 0 else False
+            state = np.array([readings['state']])
+            print(state)
 
-        # Drop the sonar.
-        visualize_polar(state)
+            # Visualize our distances.
+            visualize_polar(state)
 
-        # Get the action.
-        action = pb.get_action(state)
-        print("Doing action %d" % action)
+            # Get the action.
+            action = pb.get_action(state)
+            print("Doing action %d" % action)
+        except:
+            print("Error getting readings.")
