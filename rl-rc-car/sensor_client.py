@@ -5,8 +5,8 @@ http://ilab.cs.byu.edu/python/socket/echoclient.html
 
 import socket
 import time
-import sys
 import json
+from vis import visualize_polar
 
 
 class SensorClient:
@@ -59,8 +59,9 @@ if __name__ == '__main__':
         state = np.array([readings['state']])
         print(proximity, state)
 
+        # Drop the sonar.
+        visualize_polar(state)
+
         # Get the action.
         action = pb.get_action(state)
         print("Doing action %d" % action)
-
-        time.sleep(2)
