@@ -6,6 +6,7 @@ http://ilab.cs.byu.edu/python/socket/echoclient.html
 import socket
 import time
 import sys
+import json
 
 
 class SensorClient:
@@ -20,45 +21,46 @@ class SensorClient:
         readings = s.recv(self.size)
         s.close()
 
-        # Turn our weird stringed list into an actual list.
-        readings = readings.decode('utf-8')
-        print(readings)
-        readings = readings[1:-1]
-        readings = readings.split(', ')
-        readings = [float(i) for i in readings]
+        # Decode the response into a dictionary.
+        readings = json.loads(readings.decode('utf-8'))
 
-        return readings
+        # Now return our data the way our NN expects it.
+        # We separate out the proximity sensors because those are just
+        # used to turn the car around. We concat the sonar array
+        # with our middle sonar to build the actual state.
+        return_dict = {
+            'ir_l': readings['ir_l'],
+            'ir_r': readings['ir_r'],
+            'state': readings['ir_s'] + [readings['s_m']]
+        }
+        return return_dict
 
 
 if __name__ == '__main__':
-    sc = SensorClient(host='192.168.2.10')
-    readings = sc.get_readings()
-
-    print(readings)
-
-    sys.exit()
     # Testing it out.
     from becho import becho, bechonet
     import numpy as np
 
     network = bechonet.BechoNet(
-        num_actions=6, num_inputs=3,
-        nodes_1=256, nodes_2=256, verbose=True,
+        num_actions=3, num_inputs=17,
+        nodes_1=1024, nodes_2=1024, verbose=True,
         load_weights=True,
-        weights_file='saved-models/sonar-and-ir-9750.h5')
+        weights_file='saved-models/servo-9700.h5')
     pb = becho.ProjectBecho(
-        network, num_actions=6, num_inputs=3,
+        network, num_actions=3, num_inputs=17,
         verbose=True, enable_training=False)
     sensors = SensorClient(host='192.168.2.10')
 
     while True:
         # Get the reading.
         readings = sensors.get_readings()
-        readings = np.array([readings])
-        print(readings)
+        proximity = True if readings['ir_l'] == 0 or \
+            readings['ir_r'] == 0 else False
+        state = np.array([readings['state']])
+        print(proximity, state)
 
         # Get the action.
-        action = pb.get_action(readings)
+        action = pb.get_action(state)
         print("Doing action %d" % action)
 
-        time.sleep(0.5)
+        time.sleep(2)

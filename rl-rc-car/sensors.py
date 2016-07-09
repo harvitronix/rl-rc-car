@@ -162,6 +162,9 @@ class Sensors:
             angle = int(splitup[0])
             distance = int(splitup[1])
 
+            # Limit distance returned.
+            distance = 90 if distance > 90 else distance
+
             # Change the angle into an index.
             index = 0 if angle == 0 else int(angle / 12)
 
