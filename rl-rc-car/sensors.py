@@ -4,6 +4,7 @@ This module holds classes for interacting with our sensors.
 Currently supports:
 - IR proximity
 - Sonar
+- IR distance via Arduino
 
 Example: ir_pins = [24, 25, 28]
 Example: sonar_pins = [[24, 25], [28, 29]]
@@ -118,12 +119,13 @@ class Sensors:
         ir_reading_l = self.irs[0].get_reading()
         ir_reading_r = self.irs[1].get_reading()
         sonar_reading = self.sonars[0].get_reading()
-        ir_reading = self.ir_sweep.get_reading()
+        ir_sweep_reading = self.ir_sweep.get_reading()
 
         # Limit distance returned.
         sonar_reading = 90 if sonar_reading > 90 else sonar_reading
 
-        return [ir_reading_l, int(sonar_reading), ir_reading_r, ir_reading]
+        return [ir_reading_l, int(sonar_reading),
+                ir_reading_r, ir_sweep_reading]
 
     def cleanup_gpio(self):
         gpio.cleanup()
