@@ -26,7 +26,8 @@ class SensorServer:
             data = json.load(f)
         try:
             print("Sending: %s" % str(data))
-            client.send(data.encode(encoding='utf_8'))
+            b = json.dumps(data).encode('utf-8')
+            client.sendall(b)
         except:
             print("Couldn't send data.")
         client.close()

@@ -5,6 +5,7 @@ http://ilab.cs.byu.edu/python/socket/echoclient.html
 
 import socket
 import time
+import sys
 
 
 class SensorClient:
@@ -21,6 +22,7 @@ class SensorClient:
 
         # Turn our weird stringed list into an actual list.
         readings = readings.decode('utf-8')
+        print(readings)
         readings = readings[1:-1]
         readings = readings.split(', ')
         readings = [float(i) for i in readings]
@@ -29,6 +31,12 @@ class SensorClient:
 
 
 if __name__ == '__main__':
+    sc = SensorClient(host='192.168.2.10')
+    readings = sc.get_readings()
+
+    print(readings)
+
+    sys.exit()
     # Testing it out.
     from becho import becho, bechonet
     import numpy as np
@@ -41,7 +49,7 @@ if __name__ == '__main__':
     pb = becho.ProjectBecho(
         network, num_actions=6, num_inputs=3,
         verbose=True, enable_training=False)
-    sensors = SensorClient()
+    sensors = SensorClient(host='192.168.2.10')
 
     while True:
         # Get the reading.
