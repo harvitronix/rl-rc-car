@@ -104,7 +104,7 @@ class Sensors:
                 self.sonars.append(SonarSensor(sonar[1], sonar[0]))
 
         # Initialize our IR sensor on the servo.
-        self.ir_sweep = IRDistance()
+        self.ir_sweep = IRDistance(path='/dev/ttyACM0')
 
         # Wait for sensors to settle.
         print("Initializing sensors.")
