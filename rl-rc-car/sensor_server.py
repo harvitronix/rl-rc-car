@@ -6,7 +6,7 @@ http://ilab.cs.byu.edu/python/socket/echoserver.html
 """
 
 import socket
-from sensors import Sensors
+import json
 
 
 class SensorServer:
@@ -20,9 +20,10 @@ class SensorServer:
         self.s.bind((host, port))
         self.s.listen(backlog)
 
-    def serve_readings(self, sensors):
+    def serve_readings(self):
         client, address = self.s.accept()
-        data = str(sensors.get_all_readings())
+        with open('readings.json') as f:
+            data = json.load(f)
         try:
             print("Sending: %s" % str(data))
             client.send(data.encode(encoding='utf_8'))
@@ -32,15 +33,7 @@ class SensorServer:
 
 
 if __name__ == '__main__':
-    # Input pins.
-    ir_pins = [24, 21]
-    sonar_pins = [[25, 8]]
-
-    # Get objects.
-    sensors = Sensors(ir_pins, sonar_pins)
-    ss = SensorServer()
-
+    input("Start sensors.py in the background then hit enter to start server.")
+    ss = SensorServer
     while 1:
-        ss.serve_readings(sensors)
-
-    sensors.cleanup_gpio()
+        ss.serve_readings()
