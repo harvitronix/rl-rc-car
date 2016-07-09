@@ -86,6 +86,7 @@ if __name__ == '__main__':
 
         if car.proximity_alert(state):
             print('Proximity alert!')
+            car.recover()
 
         print("-"*80)
 

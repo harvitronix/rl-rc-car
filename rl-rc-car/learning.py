@@ -54,7 +54,7 @@ for i in range(frames):
         reward, new_state = game_state.frame_step(action)
 
     # Mimic terminal for reporting.
-    if reward == -1000:
+    if reward == -500:
         terminal = True
         game_state.recover()
         print("Proximity alert at frame %d." % i)

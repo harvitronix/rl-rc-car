@@ -191,7 +191,7 @@ class GameState:
     def get_reward(self, readings, turning):
         if readings[0] == 0 or readings[1] == 0:
             # One of our front-facing sensors is very close to something.
-            reward = -1000
+            reward = -500
         elif turning:
             # Less reward if turning.
             reward = 0
