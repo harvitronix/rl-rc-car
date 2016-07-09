@@ -160,6 +160,8 @@ class Sensors:
         # Change the angle into an index.
         index = 0 if angle == 0 else int(angle / 12)
 
+        print(angle,distance,index)
+
         # Get the old array and update the index at this angle.
         new_values = self.readings['ir_s'][:]
         new_values[index] = distance
