@@ -194,10 +194,10 @@ class GameState:
             reward = -500
         elif turning:
             # Less reward if turning.
-            reward = 0
+            reward = 1
         else:
             # We're going straight.
-            reward = 1
+            reward = 2
 
         return reward
 

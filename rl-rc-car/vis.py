@@ -23,7 +23,7 @@ def visualize_polar(state):
 
     # Orient the plot with north (0 degrees) to the top
     ax.set_theta_zero_location('N')
-    ax.set_ylim(bottom=0, top=70)
+    ax.set_ylim(bottom=0, top=105)
 
     plt.plot(r, t)
     plt.draw()

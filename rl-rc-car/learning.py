@@ -49,6 +49,7 @@ for i in range(frames):
     # Let's see what the robocar sees.
     if visualize:
         # visualize_sensors(state)
+        print(state)
         visualize_polar(state)
 
     for x in range(repeat_action):
