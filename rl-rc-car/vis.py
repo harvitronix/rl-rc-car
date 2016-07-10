@@ -16,7 +16,7 @@ def visualize_polar(state):
     r = []
     t = []
     for i, s in enumerate(readings):
-        r.append(math.radians(i * 12))
+        r.append(math.radians(i * 6))
         t.append(s)
 
     ax = plt.subplot(111, polar=True)

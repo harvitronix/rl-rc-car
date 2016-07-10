@@ -1,10 +1,10 @@
 from becho import becho, bechonet
 from sim import carmunk
 import csv
-from vis import visualize_sensors
+from vis import visualize_polar
 
-frames = 10000
-inputs = 17
+frames = 500000
+inputs = 32
 actions = 3
 
 # Just change these.
@@ -22,13 +22,13 @@ else:
     save_weights = False
 
 network = bechonet.BechoNet(num_actions=actions, num_inputs=inputs,
-                            nodes_1=512, nodes_2=512, verbose=True,
+                            nodes_1=1000, nodes_2=1000, verbose=True,
                             load_weights=load_weights,
                             weights_file=weights_file,
                             save_weights=save_weights)
 pb = becho.ProjectBecho(network, frames=frames, num_actions=actions,
-                        batch_size=100, min_epsilon=0.1, num_inputs=inputs,
-                        replay_size=10000, gamma=0.9, verbose=True,
+                        batch_size=32, min_epsilon=0.1, num_inputs=inputs,
+                        replay_size=10000, gamma=0.99, verbose=True,
                         enable_training=enable_training,
                         save_steps=750)
 
@@ -48,7 +48,8 @@ for i in range(frames):
 
     # Let's see what the robocar sees.
     if visualize:
-        visualize_sensors(state)
+        # visualize_sensors(state)
+        visualize_polar(state)
 
     for x in range(repeat_action):
         reward, new_state = game_state.frame_step(action)

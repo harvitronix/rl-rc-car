@@ -31,9 +31,9 @@ class Sensors:
         self.sweep_direction = 0
         self.sweep_offsets = []
         self.sweep_readings = []
-        for i in range(16):
+        for i in range(31):
             # Get our angles.
-            self.sweep_offsets.append(-1.5 + i * 0.2)
+            self.sweep_offsets.append(-1.5 + i * 0.1)
             # Set initial readings.
             self.sweep_readings.append(100)
 
@@ -99,7 +99,7 @@ class Sensors:
 
         # Used to count the distance.
         i = 0
-        max_sonar_distance = 2
+        max_sonar_distance = 3
 
         # Look at each point and see if we've hit something.
         for point in arm:
@@ -138,12 +138,12 @@ class Sensors:
                 return 1
 
     def make_sensor_arm(self, x, y):
-        spread = 8  # Default spread.
+        spread = 4  # Default spread.
         distance = 10  # Gap before first sensor.
         arm_points = []
         # Make an arm. We build it flat because we'll rotate it about the
         # center later.
-        for i in range(1, 40):
+        for i in range(1, 100):
             arm_points.append((distance + x + (spread * i), y))
 
         return arm_points
@@ -165,24 +165,26 @@ class Sensors:
             return 1
 
     def set_sonar_sweep(self):
-        # Get the reading at the current offset.
-        so = self.sweep_offsets[self.sweep_position]
-        self.sweep_readings[self.sweep_position] = \
-            self.get_sensor_reading(self.arm,
-                                    self.x, self.y,
-                                    self.angle, so,
-                                    s_type='sonar')
+        # Do a number of steps for each frame.
+        for i in range(12):
+            # Get the reading at the current offset.
+            so = self.sweep_offsets[self.sweep_position]
+            self.sweep_readings[self.sweep_position] = \
+                self.get_sensor_reading(self.arm,
+                                        self.x, self.y,
+                                        self.angle, so,
+                                        s_type='sonar')
 
-        # Figure out the next position so it actually sweeps.
-        if self.sweep_direction == 0:
-            if self.sweep_position < len(self.sweep_offsets) - 1:
-                self.sweep_position += 1
+            # Figure out the next position so it actually sweeps.
+            if self.sweep_direction == 0:
+                if self.sweep_position < len(self.sweep_offsets) - 1:
+                    self.sweep_position += 1
+                else:
+                    self.sweep_direction = 1
+                    self.sweep_position -= 1
             else:
-                self.sweep_direction = 1
-                self.sweep_position -= 1
-        else:
-            if self.sweep_position > 0:
-                self.sweep_position -= 1
-            else:
-                self.sweep_direction = 0
-                self.sweep_position += 1
+                if self.sweep_position > 0:
+                    self.sweep_position -= 1
+                else:
+                    self.sweep_direction = 0
+                    self.sweep_position += 1

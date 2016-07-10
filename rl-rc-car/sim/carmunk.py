@@ -197,7 +197,7 @@ class GameState:
             reward = 0
         else:
             # We're going straight.
-            reward = 2
+            reward = 1
 
         return reward
 

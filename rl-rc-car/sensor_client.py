@@ -6,7 +6,7 @@ http://ilab.cs.byu.edu/python/socket/echoclient.html
 import socket
 import time
 import json
-from vis import visualize_polar
+from vis import visualize_polar, visualize_sensors
 
 
 class SensorClient:
@@ -58,7 +58,6 @@ if __name__ == '__main__':
             proximity = True if readings['ir_l'] == 0 or \
                 readings['ir_r'] == 0 else False
             state = np.array([readings['state']])
-            print(state)
 
             # Visualize our distances.
             visualize_polar(state)
