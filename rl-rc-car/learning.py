@@ -22,12 +22,12 @@ else:
     save_weights = False
 
 network = bechonet.BechoNet(num_actions=actions, num_inputs=inputs,
-                            nodes_1=1024, nodes_2=1024, verbose=True,
+                            nodes_1=512, nodes_2=512, verbose=True,
                             load_weights=load_weights,
                             weights_file=weights_file,
                             save_weights=save_weights)
 pb = becho.ProjectBecho(network, frames=frames, num_actions=actions,
-                        batch_size=32, min_epsilon=0.1, num_inputs=inputs,
+                        batch_size=100, min_epsilon=0.1, num_inputs=inputs,
                         replay_size=10000, gamma=0.9, verbose=True,
                         enable_training=enable_training,
                         save_steps=750)
