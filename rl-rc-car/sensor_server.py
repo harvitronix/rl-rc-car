@@ -41,3 +41,4 @@ if __name__ == '__main__':
             ss.serve_readings()
         except:
             print("Got an error serving up readings.")
+            raise

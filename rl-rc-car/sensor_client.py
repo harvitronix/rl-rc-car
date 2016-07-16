@@ -41,13 +41,16 @@ if __name__ == '__main__':
     from becho import becho, bechonet
     import numpy as np
 
+    inputs = 32
+    actions = 3
+
     network = bechonet.BechoNet(
-        num_actions=3, num_inputs=17,
-        nodes_1=1024, nodes_2=1024, verbose=True,
+        num_actions=actions, num_inputs=inputs,
+        nodes_1=50, nodes_2=50, verbose=True,
         load_weights=True,
         weights_file='saved-models/servo-9700.h5')
     pb = becho.ProjectBecho(
-        network, num_actions=3, num_inputs=17,
+        network, num_actions=actions, num_inputs=inputs,
         verbose=True, enable_training=False)
     sensors = SensorClient(host='192.168.2.10')
 
@@ -67,3 +70,4 @@ if __name__ == '__main__':
             print("Doing action %d" % action)
         except:
             print("Error getting readings.")
+            raise
