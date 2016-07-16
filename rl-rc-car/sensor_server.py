@@ -21,15 +21,18 @@ class SensorServer:
         self.s.listen(backlog)
 
     def serve_readings(self):
-        client, address = self.s.accept()
         with open('readings.json') as f:
-            data = json.load(f)
-        try:
-            print("Sending: %s" % str(data))
-            b = json.dumps(data).encode('utf-8')
-            client.sendall(b)
-        except:
-            print("Couldn't send data.")
+            try:
+                data = json.load(f)
+            except:
+                print("Got bad JSON data from file. Not sending.")
+                raise
+                return None
+
+        client, address = self.s.accept()
+        print("Sending: %s" % str(data))
+        b = json.dumps(data).encode('utf-8')
+        client.sendall(b)
         client.close()
 
 
@@ -37,8 +40,4 @@ if __name__ == '__main__':
     input("Start sensors.py in the background then hit enter to start server.")
     ss = SensorServer()
     while 1:
-        try:
-            ss.serve_readings()
-        except:
-            print("Got an error serving up readings.")
-            raise
+        ss.serve_readings()
