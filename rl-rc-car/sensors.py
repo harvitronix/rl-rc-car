@@ -60,7 +60,10 @@ class SonarSensor:
                 pulse_duration = pulse_end - pulse_start
                 all_readings.append(pulse_duration * 17150)
 
-        return median(all_readings)
+        if len(all_readings) > 0:
+            return median(all_readings)
+        else:
+            return 90.
 
 
 class IRSensor:
