@@ -42,6 +42,8 @@ class SonarSensor:
             gpio.output(self.out_p, True)
             time.sleep(0.00001)
             gpio.output(self.out_p, False)
+            pulse_start = None
+            pulse_end = None
 
             # Read.
             while gpio.input(self.in_p) == 0 and iterations < 1000:
