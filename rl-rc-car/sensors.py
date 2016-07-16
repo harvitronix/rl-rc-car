@@ -151,6 +151,7 @@ class Sensors:
         # Only update the IR readings if we got a good return value.
         if ir_distance_reading is not None:
             new_sweep = self.update_sweep(ir_distance_reading)
+            print(new_sweep)
             self.readings['ir_s'] = new_sweep
 
     def cleanup_gpio(self):
