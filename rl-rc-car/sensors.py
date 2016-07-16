@@ -80,7 +80,11 @@ class IRDistance:
         print("Initialized an IR distance sensor at %s " % path)
 
     def get_reading(self):
-        return self.ser.readline().decode("utf-8").rstrip()
+        """Read off the serial port and decode the results."""
+        try:
+            return self.ser.readline().decode("utf-8").rstrip()
+        except:
+            return None
 
 
 class Sensors:
@@ -144,10 +148,10 @@ class Sensors:
         self.readings['ir_r'] = ir_reading_r
         self.readings['s_m'] = int(sonar_reading)
 
-        new_sweep = self.update_sweep(ir_distance_reading)
-        print("AAAA")
-        print(new_sweep)
-        self.readings['ir_s'] = new_sweep
+        # Only update the IR readings if we got a good return value.
+        if ir_distance_reading is not None:
+            new_sweep = self.update_sweep(ir_distance_reading)
+            self.readings['ir_s'] = new_sweep
 
     def cleanup_gpio(self):
         gpio.cleanup()
@@ -156,6 +160,7 @@ class Sensors:
         # Copy the old value.
         new_values = self.readings['ir_s'][:]
 
+        print("BBB")
         print(new_values)
 
         # The reading we get from Arduino is in format "X|Y" where
