@@ -2,14 +2,17 @@ from becho import becho, bechonet
 from sim import carmunk
 import csv
 from vis import visualize_polar
+from statistics import mean
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 frames = 500000
 inputs = 32
 actions = 3
 
 # Just change these.
-train = True
-weights_file = 'saved-models/servo.h5'
+train = False
+weights_file = 'saved-models/servo-332900.h5'
 visualize = False
 
 if train:
@@ -22,7 +25,7 @@ else:
     save_weights = False
 
 network = bechonet.BechoNet(num_actions=actions, num_inputs=inputs,
-                            nodes_1=1000, nodes_2=1000, verbose=True,
+                            nodes_1=50, nodes_2=50, verbose=True,
                             load_weights=load_weights,
                             weights_file=weights_file,
                             save_weights=save_weights)
@@ -37,6 +40,7 @@ distances = []
 results = []
 distance = 0
 repeat_action = 3
+losses = []
 
 game_state = carmunk.GameState(noisey=False)
 _, state = game_state.frame_step((2))
@@ -69,6 +73,24 @@ for i in range(frames):
     # Every 100 frames, show us something.
     if i % 100 == 0 and i > 0:
         print("Epsilon: %.5f" % pb.epsilon)
+
+        # Print our recent loss.
+        new_ll = []
+        if len(network.loss_log) > 50:
+            # There has to be a better way to do this...
+            for ll in network.loss_log:
+                new_ll.append(ll[0].tolist())
+            mean_loss = mean(new_ll)
+            print("Mean loss, last 50 frames: %f" %
+                  (mean_loss))
+            losses.append(mean_loss)
+
+            # Plotting.
+            sns.plt.clf()
+            sns.set_style("darkgrid")
+            plt.plot(losses)
+            sns.plt.draw()
+            sns.plt.pause(0.05)
 
         # Update the save filename so we can look at different points.
         new_ending = '-' + str(i) + '.h5'

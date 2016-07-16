@@ -27,9 +27,9 @@ def get_reward_from_sensors(car, readings, action):
 
 if __name__ == '__main__':
     train = False
-    weights_file = 'saved-models/sonar-and-ir-walls.h5'
+    weights_file = 'saved-models/servo-332900.h5'
 
-    inputs = 17
+    inputs = 32
     actions = 3
 
     if train:
@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     network = bechonet.BechoNet(
         num_actions=actions, num_inputs=inputs,
-        nodes_1=256, nodes_2=256, verbose=True,
+        nodes_1=50, nodes_2=50, verbose=True,
         load_weights=load_weights,
         weights_file=weights_file,
         save_weights=save_weights
