@@ -142,7 +142,7 @@ class Sensors:
         """
         ir_reading_l = self.irs[0].get_reading()
         ir_reading_r = self.irs[1].get_reading()
-        sonar_reading = self.sonars[0].get_reading()
+        sonar_reading = self.sonars[0].get_reading(10, 1000)
         ir_distance_reading = self.ir_sweep.get_reading()
 
         # Limit distance returned.
