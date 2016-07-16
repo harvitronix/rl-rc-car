@@ -15,6 +15,7 @@ from statistics import median
 import serial
 import sys
 import json
+gpio.setmode(gpio.BCM)
 
 
 class SonarSensor:
@@ -95,8 +96,6 @@ class Sensors:
     def __init__(self, ir_pins, sonar_pins):
         self.ir_pins = ir_pins
         self.sonar_pins = sonar_pins
-
-        gpio.setmode(gpio.BCM)
 
         # Initialize the IR sensors.
         self.irs = []
