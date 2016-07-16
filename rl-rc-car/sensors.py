@@ -43,11 +43,11 @@ class SonarSensor:
             gpio.output(self.out_p, False)
 
             # Read.
-            while gpio.input(self.in_p) == 0 and iterations < 5:
+            while gpio.input(self.in_p) == 0 and iterations < 1000:
                 pulse_start = time.time()
                 iterations += 1
 
-            while gpio.input(self.in_p) == 1 and iterations < 5:
+            while gpio.input(self.in_p) == 1 and iterations < 1000:
                 pulse_end = time.time()
 
             # Turn time into distance.
@@ -138,15 +138,15 @@ class Sensors:
         """
         ir_reading_l = self.irs[0].get_reading()
         ir_reading_r = self.irs[1].get_reading()
-        sonar_reading = self.sonars[0].get_reading()
+        # sonar_reading = self.sonars[0].get_reading()
         ir_distance_reading = self.ir_sweep.get_reading()
 
         # Limit distance returned.
-        sonar_reading = 90 if sonar_reading > 90 else sonar_reading
+        # sonar_reading = 90 if sonar_reading > 90 else sonar_reading
 
         self.readings['ir_l'] = ir_reading_l
         self.readings['ir_r'] = ir_reading_r
-        self.readings['s_m'] = int(sonar_reading)
+        # self.readings['s_m'] = int(sonar_reading)
 
         # Only update the IR readings if we got a good return value.
         if ir_distance_reading is not None:
