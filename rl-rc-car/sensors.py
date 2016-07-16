@@ -143,7 +143,11 @@ class Sensors:
         self.readings['ir_l'] = ir_reading_l
         self.readings['ir_r'] = ir_reading_r
         self.readings['s_m'] = int(sonar_reading)
-        self.readings['ir_s'] = self.update_sweep(ir_distance_reading)
+
+        new_sweep = self.update_sweep(ir_distance_reading)
+        print("AAAA")
+        print(new_sweep)
+        self.readings['ir_s'] = new_sweep
 
     def cleanup_gpio(self):
         gpio.cleanup()
@@ -151,6 +155,8 @@ class Sensors:
     def update_sweep(self, reading):
         # Copy the old value.
         new_values = self.readings['ir_s'][:]
+
+        print(new_values)
 
         # The reading we get from Arduino is in format "X|Y" where
         # X = the angle and Y = the distance.
