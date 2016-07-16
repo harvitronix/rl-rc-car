@@ -26,14 +26,14 @@ class SensorServer:
                 data = json.load(f)
             except:
                 print("Got bad JSON data from file. Not sending.")
-                raise
-                return None
+                return False
 
         client, address = self.s.accept()
         print("Sending: %s" % str(data))
         b = json.dumps(data).encode('utf-8')
         client.sendall(b)
         client.close()
+        return True
 
 
 if __name__ == '__main__':
