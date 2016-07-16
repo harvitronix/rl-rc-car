@@ -10,7 +10,7 @@ from vis import visualize_polar, visualize_sensors
 
 
 class SensorClient:
-    def __init__(self, host='192.168.2.9', port=8888, size=1024):
+    def __init__(self, host, port=8888, size=1024):
         self.host = host
         self.port = port
         self.size = size
