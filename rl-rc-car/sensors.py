@@ -27,7 +27,7 @@ class SonarSensor:
         print("Initialized a sonar sensor at %d (in) %d (out)" %
               (self.in_p, self.out_p))
 
-    def get_reading(self, num_readings=5):
+    def get_reading(self, num_readings=5, max_iterations=1000):
         """
         Take multiple readings and return the median. Helps with highly
         variant and error-prone readings.
@@ -43,11 +43,11 @@ class SonarSensor:
             gpio.output(self.out_p, False)
 
             # Read.
-            while gpio.input(self.in_p) == 0 and iterations < 1000:
+            while gpio.input(self.in_p) == 0 and iterations < max_iterations:
                 pulse_start = time.time()
                 iterations += 1
 
-            while gpio.input(self.in_p) == 1 and iterations < 1000:
+            while gpio.input(self.in_p) == 1 and iterations < max_iterations:
                 pulse_end = time.time()
 
             # Turn time into distance.
