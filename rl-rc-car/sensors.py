@@ -151,7 +151,6 @@ class Sensors:
         # Only update the IR readings if we got a good return value.
         if ir_distance_reading is not None:
             new_sweep = self.update_sweep(ir_distance_reading)
-            print(new_sweep)
             self.readings['ir_s'] = new_sweep
 
     def cleanup_gpio(self):
@@ -160,9 +159,6 @@ class Sensors:
     def update_sweep(self, reading):
         # Copy the old value.
         new_values = self.readings['ir_s'][:]
-
-        print("BBB")
-        print(new_values)
 
         # The reading we get from Arduino is in format "X|Y" where
         # X = the angle and Y = the distance.
