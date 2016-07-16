@@ -176,6 +176,7 @@ class Sensors:
             # Change the angle into an index.
             index = 0 if angle == 0 else int(angle / 6)
 
+            print(index)
             # Update the value at the index.
             new_values[index] = distance
         else:
