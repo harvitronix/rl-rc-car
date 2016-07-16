@@ -47,7 +47,7 @@ class SonarSensor:
                 pulse_start = time.time()
                 iterations += 1
 
-            while gpio.input(self.in_p) == 1:
+            while gpio.input(self.in_p) == 1 and iterations < 1000:
                 pulse_end = time.time()
 
             # Turn time into distance.
