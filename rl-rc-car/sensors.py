@@ -54,11 +54,8 @@ class SonarSensor:
                 iterations += 1
 
             # Turn time into distance.
-            try:
-                pulse_duration = pulse_end - pulse_start
-                all_readings.append(pulse_duration * 17150)
-            except:
-                all_readings.append(0)
+            pulse_duration = pulse_end - pulse_start
+            all_readings.append(pulse_duration * 17150)
 
         return median(all_readings)
 
