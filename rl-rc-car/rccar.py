@@ -82,7 +82,7 @@ class RCCar:
             time.sleep(self.wait_time)
 
     def proximity_alert(self, readings):
-        if readings[0][0] == 0 or readings[0][2] == 0 or readings[0][1] < 5:
+        if readings['ir_r'] == 0 or readings['ir_l'] == 0:
             return True
         else:
             return False

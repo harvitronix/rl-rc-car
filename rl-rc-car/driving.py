@@ -60,8 +60,8 @@ if __name__ == '__main__':
     input("Ready to roll! Press any key to go.")
 
     # Get initial state.
-    state = sensors.get_readings()
-    state = np.array([state])
+    readings = sensors.get_readings()
+    state = np.array([readings['state']])
 
     for i in range(500):
         # Get action.
@@ -74,8 +74,8 @@ if __name__ == '__main__':
         car.step(action)
 
         # Get new readings.
-        new_state = sensors.get_readings()
-        new_state = np.array([new_state])
+        new_readings = sensors.get_readings()
+        new_state = np.array([new_readings['state']])
 
         if enable_training:
             # Get reward.
@@ -87,7 +87,7 @@ if __name__ == '__main__':
         # Override state.
         state = new_state
 
-        if car.proximity_alert(state):
+        if car.proximity_alert(new_readings):
             print('Proximity alert!')
             car.recover()
 
