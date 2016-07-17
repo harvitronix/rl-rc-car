@@ -9,7 +9,7 @@ import sys
 import json
 
 r_server = redis.Redis('localhost')
-verbose = False
+verbose = True
 
 
 def do_sonar(pins):
