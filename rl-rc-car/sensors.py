@@ -240,6 +240,7 @@ if __name__ == '__main__':
 
     # Set the rest of our readings and write out the file.
     while True:
+        print("Yes")
         # Take readings and store them in a dict.
         sensors.set_other_readings()
         # Write the dict to file.
