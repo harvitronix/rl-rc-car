@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
         if 'step' in data:
             action = data.split('-')[1]
-            car_server.step(action)
+            car_server.step(int(action))
         elif data == 'cleanup_gpio':
             car_server.cleanup_gpio()
         elif data == 'recover':
