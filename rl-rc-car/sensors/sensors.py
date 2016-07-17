@@ -104,6 +104,7 @@ class IRDistance:
         try:
             return self.ser.readline().decode("utf-8").rstrip()
         except:
+            raise
             return None
 
 
