@@ -55,7 +55,7 @@ if __name__ == '__main__':
         replay_size=100000, gamma=0.9, save_steps=100
     )
     car = RCCar(apply_time=0.2, wait_time=0.4)
-    sensors = SensorClient()
+    sensors = SensorClient('192.168.2.10')
 
     input("Ready to roll! Press any key to go.")
 
