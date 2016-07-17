@@ -34,11 +34,14 @@ class SonarSensor:
         print("Initialized a sonar sensor at %d (in) %d (out)" %
               (self.in_p, self.out_p))
 
-    def get_reading(self):
+    def get_reading(self, max_iterations, max_distance, num_readings):
         """
         Take multiple readings and return the median. Helps with highly
         variant and error-prone readings.
         """
+        self.max_iterations = max_iterations
+        self.max_distance = max_distance
+        self.num_readings = num_readings
         iterations = 0
 
         all_readings = []
