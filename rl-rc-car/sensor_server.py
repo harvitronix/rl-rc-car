@@ -26,7 +26,7 @@ class SensorServer:
         ir_s = self.r_server.get('ir_s')
         ir_l = self.r_server.get('ir_l')
         ir_r = self.r_server.get('ir_r')
-        s_m = json.loads(self.r_server.get('s_m'))
+        s_m = json.loads(self.r_server.get('s_m').decode('utf-8'))
 
         readings = {
             'ir_s': ir_s,
