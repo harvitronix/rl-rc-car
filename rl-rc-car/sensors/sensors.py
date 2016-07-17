@@ -34,14 +34,11 @@ class SonarSensor:
         print("Initialized a sonar sensor at %d (in) %d (out)" %
               (self.in_p, self.out_p))
 
-    def get_reading(self, max_iterations, max_distance, num_readings):
+    def get_reading(self):
         """
         Take multiple readings and return the median. Helps with highly
         variant and error-prone readings.
         """
-        self.max_iterations = max_iterations
-        self.max_distance = max_distance
-        self.num_readings = num_readings
         iterations = 0
 
         all_readings = []
@@ -221,7 +218,7 @@ class Sensors:
 
     def set_sonar_reading(self):
         """Get the sonar reading. This happens slowly."""
-        sonar_reading = self.sonars[0].get_reading(10, 1000)
+        sonar_reading = self.sonars[0].get_reading()
         self.readings['s_m'] = int(sonar_reading)
 
     def cleanup_gpio(self):
