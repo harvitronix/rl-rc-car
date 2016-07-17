@@ -124,7 +124,9 @@ class IRSweep:
         # Return the readings even if we don't update it.
         # We reverse them because 0 is on the right.
         flipped = self.readings[:]
-        return flipped.reverse()
+        print("A")
+        print(flipped)
+        return [1, 2, 3]
 
     def update_sweep(self, reading):
         # Copy the old value.
