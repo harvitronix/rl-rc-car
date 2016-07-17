@@ -13,11 +13,11 @@ class RCCarClient:
     def send_message(self, message):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.host, self.port))
-        s.send(message)
+        s.send(message.encode())
         s.close()
 
     def cleanup_gpio(self):
-        self.send_message('cleanup_gpi')
+        self.send_message('cleanup_gpio')
 
     def step(self, action):
         self.send_message('step-' + str(action))

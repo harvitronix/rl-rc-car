@@ -36,6 +36,14 @@ if __name__ == '__main__':
     while True:
         conn, address = car_server.s.accept()
         data = conn.recv(car_server.size)
-        print("Received:")
-        print(data)
+        data = data.decode()
+        print("Received: %s" data)
         conn.close()
+
+        if 'step' in data:
+            action = data.split('-')[1]
+            car_server.step(action)
+        elif data == 'cleanup_gpio':
+            car_server.cleanup_gpio()
+        elif data == 'recover':
+            car_server.recover()
