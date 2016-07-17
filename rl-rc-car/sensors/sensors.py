@@ -15,7 +15,6 @@ from statistics import median
 import serial
 import sys
 import json
-import threading
 
 # Setup the pi.
 gpio.setmode(gpio.BCM)
@@ -96,7 +95,7 @@ class IRDistance:
     """
     Read it from Arduino because it's analog.
     """
-    def __init__(self, path='/dev/tty.usbmodemFD131', baud=9600):
+    def __init__(self, path='', baud=9600):
         self.ser = serial.Serial(path, baud)
         print("Initialized an IR distance sensor at %s " % path)
 
@@ -108,79 +107,26 @@ class IRDistance:
             return None
 
 
-class Sensors:
-    """
-    While the above classes are general to the sensor, this class is used
-    specifically to get the sensors we use on Robocar.
-    """
-    def __init__(self, ir_pins, sonar_pins):
-        self.ir_pins = ir_pins
-        self.sonar_pins = sonar_pins
-
-        # Initialize the IR sensors.
-        self.irs = []
-        if len(self.ir_pins) > 0:
-            for ir in self.ir_pins:
-                self.irs.append(IRSensor(ir))
-
-        # Initialize the sonar sensors.
-        self.sonars = []
-        if len(self.sonar_pins) > 0:
-            for sonar in self.sonar_pins:
-                self.sonars.append(SonarSensor(sonar[1], sonar[0]))
-
-        # Initialize our IR sensor on the servo.
-        a_path = '/dev/ttyACM0'
-        try:
-            self.ir_sweep = IRDistance(path=a_path)
-        except:
-            print("Couldn't find an Arduino at %s" % a_path)
-            print("Exiting.")
-            sys.exit(0)
-
-        # Wait for sensors to settle.
-        print("Initializing sensors.")
-        time.sleep(2)
-        print("Ready.")
-
-        # To store readings we'll retrieve from the server.
-        self.readings = {
-            'ir_l': 1,
-            'ir_r': 1,
-            's_m': 100,
-            'ir_s': [100 for x in range(31)],
-        }
+class IRSweep:
+    """Use a servo to sweep and take readings."""
+    def __init__(self, path='', baud=9600):
+        self.IRD = IRDistance(path, baud)
+        self.readings = [100 for x in range(31)]
 
     def set_ir_sweep_reading(self):
-        """We put this in its own method so we can parallelize it."""
-        ir_distance_reading = self.ir_sweep.get_reading()
+        """Get IR reading."""
+        ir_distance_reading = self.IRD.get_reading()
 
         # Only update the IR readings if we got a good return value.
         if ir_distance_reading is not None:
             new_sweep = self.update_sweep(ir_distance_reading)
-            self.readings['ir_s'] = new_sweep
-
-    def set_other_readings(self):
-        """
-        This is specific to how we need the readings. Should be generalized.
-        """
-        ir_reading_l = self.irs[0].get_reading()
-        ir_reading_r = self.irs[1].get_reading()
-        sonar_reading = self.sonars[0].get_reading(10, 1000)
-
-        self.readings['ir_l'] = ir_reading_l
-        self.readings['ir_r'] = ir_reading_r
-        self.readings['s_m'] = int(sonar_reading)
-
-        # Write it out.
-        self.write_readings()
-
-    def cleanup_gpio(self):
-        gpio.cleanup()
+            return new_sweep
+        else:
+            return None
 
     def update_sweep(self, reading):
         # Copy the old value.
-        new_values = self.readings['ir_s'][:]
+        new_values = self.readings[:]
 
         # The reading we get from Arduino is in format "X|Y" where
         # X = the angle and Y = the distance.
@@ -211,6 +157,73 @@ class Sensors:
 
         return new_values
 
+
+class Sensors:
+    """
+    While the above classes are general to the sensor, this class is used
+    specifically to get the sensors we use on Robocar.
+    """
+    def __init__(self, ir_pins, sonar_pins, arduino_path='/dev/ttyACM0'):
+        self.ir_pins = ir_pins
+        self.sonar_pins = sonar_pins
+        self.arduino_path = arduino_path
+
+        # Initialize the IR sensors.
+        self.irs = []
+        if len(self.ir_pins) > 0:
+            for ir in self.ir_pins:
+                self.irs.append(IRSensor(ir))
+
+        # Initialize the sonar sensors.
+        self.sonars = []
+        if len(self.sonar_pins) > 0:
+            for sonar in self.sonar_pins:
+                self.sonars.append(SonarSensor(sonar[1], sonar[0]))
+
+        # Initialize our IR sensor on the servo.
+        try:
+            self.ir_sweep = IRSweep(path=self.arduino_path)
+        except:
+            print("Couldn't find an Arduino at %s" % self.arduino_path)
+            print("Exiting.")
+            sys.exit(0)
+
+        # Wait for sensors to settle.
+        print("Initializing sensors.")
+        time.sleep(2)
+        print("Ready.")
+
+        # To store readings we'll retrieve from the server.
+        self.readings = {
+            'ir_l': 1,
+            'ir_r': 1,
+            's_m': 100,
+            'ir_s': self.ir_sweep.readings,
+        }
+
+    def set_ir_sweep_reading(self):
+        """Get IR reading."""
+        new_sweeps = self.ir_sweep.set_ir_sweep_reading()
+
+        if new_sweeps is not None:
+            self.readings['ir_s'] = new_sweeps
+
+    def set_ir_proximity_readings(self):
+        """Get the proximity readings."""
+        ir_reading_l = self.irs[0].get_reading()
+        ir_reading_r = self.irs[1].get_reading()
+
+        self.readings['ir_l'] = ir_reading_l
+        self.readings['ir_r'] = ir_reading_r
+
+    def set_sonar_reading(self):
+        """Get the sonar reading. This happens slowly."""
+        sonar_reading = self.sonars[0].get_reading(10, 1000)
+        self.readings['s_m'] = int(sonar_reading)
+
+    def cleanup_gpio(self):
+        gpio.cleanup()
+
     def get_all_readings(self):
         return self.readings
 
@@ -221,25 +234,3 @@ class Sensors:
     def read_readings(self):
         with open('readings.json') as f:
             return json.load(f)
-
-
-if __name__ == '__main__':
-    # Input pins.
-    ir_pins = [24, 21]
-    sonar_pins = [[25, 8]]
-
-    sensors = Sensors(ir_pins, sonar_pins)
-
-    while True:
-        # Send IR sweep readings on its own path. We do this so that it can
-        # read and update at every step, which happens much faster than our
-        # silly sonar sensor.
-        t1 = threading.Thread(target=sensors.set_ir_sweep_reading(), args=())
-        t1.start()
-
-        # Send other readings on their own path.
-        t2 = threading.Thread(target=sensors.set_other_readings(), args=())
-        t2.start()
-
-        # Just to see what's going on.
-        print(sensors.get_all_readings())
