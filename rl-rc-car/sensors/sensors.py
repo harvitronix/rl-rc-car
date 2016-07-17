@@ -163,7 +163,7 @@ class Sensors:
     While the above classes are general to the sensor, this class is used
     specifically to get the sensors we use on Robocar.
     """
-    def __init__(self, ir_pins, sonar_pins, arduino_path='/dev/ttyACM0'):
+    def __init__(self, ir_pins, sonar_pins, arduino_path='/dev/ttyAMA0'):
         self.ir_pins = ir_pins
         self.sonar_pins = sonar_pins
         self.arduino_path = arduino_path
