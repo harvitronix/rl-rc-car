@@ -125,7 +125,7 @@ class IRSweep:
         # We reverse them because 0 is on the right.
         flipped = self.readings[:]
         print("A")
-        print(flipped)
+        print(flipped.reverse())
         return [1, 2, 3]
 
     def update_sweep(self, reading):
