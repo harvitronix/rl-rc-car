@@ -37,7 +37,7 @@ if __name__ == '__main__':
         conn, address = car_server.s.accept()
         data = conn.recv(car_server.size)
         data = data.decode()
-        print("Received: %s" data)
+        print("Received: %s" % data)
         conn.close()
 
         if 'step' in data:
