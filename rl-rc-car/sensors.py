@@ -151,16 +151,6 @@ class Sensors:
             'ir_s': [100 for x in range(31)],
         }
 
-    def do_ir_loop(self):
-        """This will be called on a new thread."""
-        while True:
-            self.set_ir_sweep_reading()
-
-    def do_other_loop(self):
-        """This will be called on a new thread."""
-        while True:
-            self.set_other_readings()
-
     def set_ir_sweep_reading(self):
         """We put this in its own method so we can parallelize it."""
         ir_distance_reading = self.ir_sweep.get_reading()
@@ -232,11 +222,6 @@ class Sensors:
         with open('readings.json') as f:
             return json.load(f)
 
-    def read_loop(self):
-        while True:
-            print(self.get_all_readings())
-            time.sleep(0.1)
-
 
 if __name__ == '__main__':
     # Input pins.
@@ -245,16 +230,14 @@ if __name__ == '__main__':
 
     sensors = Sensors(ir_pins, sonar_pins)
 
-    # Send IR sweep readings on its own path. We do this so that it can
-    # read and update at every step, which happens much faster than our
-    # silly sonar sensor.
-    _thread.start_new_thread(sensors.do_ir_loop(), ())
-
-    # Send other readings on their own path.
-    _thread.start_new_thread(sensors.do_other_loop(), ())
-
-    # Just to see what's going on.
-    _thread.start_new_thread(sensors.read_loop(), ())
-
     while True:
-        pass
+        # Send IR sweep readings on its own path. We do this so that it can
+        # read and update at every step, which happens much faster than our
+        # silly sonar sensor.
+        _thread.start_new_thread(sensors.set_ir_sweep_reading(), ())
+
+        # Send other readings on their own path.
+        _thread.start_new_thread(sensors.set_other_readings(), ())
+
+        # Just to see what's going on.
+        print(sensors.get_all_readings())
