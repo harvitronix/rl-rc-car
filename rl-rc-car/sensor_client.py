@@ -5,7 +5,6 @@ http://ilab.cs.byu.edu/python/socket/echoclient.html
 
 import socket
 import json
-from vis import visualize_polar
 
 
 class SensorClient:
