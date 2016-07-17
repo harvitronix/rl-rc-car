@@ -13,8 +13,6 @@ import RPi.GPIO as gpio
 import time
 from statistics import median
 import serial
-import sys
-import json
 
 # Setup the pi.
 gpio.setmode(gpio.BCM)
@@ -31,8 +29,10 @@ class SonarSensor:
         self.max_distance = max_distance
         self.num_readings = num_readings
         self.max_iterations = max_iterations
-        print("Initialized a sonar sensor at %d (in) %d (out)" %
+        print("Initializing a sonar sensor at %d (in) %d (out)" %
               (self.in_p, self.out_p))
+        time.sleep(2)
+        print("Ready.")
 
     def get_reading(self):
         """
@@ -156,79 +156,3 @@ class IRSweep:
             print(splitup)
 
         return new_values
-
-
-class Sensors:
-    """
-    While the above classes are general to the sensor, this class is used
-    specifically to get the sensors we use on Robocar.
-    """
-    def __init__(self, ir_pins, sonar_pins, arduino_path='/dev/ttyAMA0'):
-        self.ir_pins = ir_pins
-        self.sonar_pins = sonar_pins
-        self.arduino_path = arduino_path
-
-        # Initialize the IR sensors.
-        self.irs = []
-        if len(self.ir_pins) > 0:
-            for ir in self.ir_pins:
-                self.irs.append(IRSensor(ir))
-
-        # Initialize the sonar sensors.
-        self.sonars = []
-        if len(self.sonar_pins) > 0:
-            for sonar in self.sonar_pins:
-                self.sonars.append(SonarSensor(sonar[1], sonar[0]))
-
-        # Initialize our IR sensor on the servo.
-        try:
-            self.ir_sweep = IRSweep(path=self.arduino_path)
-        except:
-            print("Couldn't find an Arduino at %s" % self.arduino_path)
-            print("Exiting.")
-            sys.exit(0)
-
-        # Wait for sensors to settle.
-        print("Initializing sensors.")
-        time.sleep(2)
-        print("Ready.")
-
-        # To store readings we'll retrieve from the server.
-        self.readings = {
-            'ir_l': 1,
-            'ir_r': 1,
-            's_m': 100,
-            'ir_s': self.ir_sweep.readings,
-        }
-
-    def set_ir_sweep_reading(self):
-        """Get IR reading."""
-        new_sweeps = self.ir_sweep.set_ir_sweep_reading()
-        self.readings['ir_s'] = new_sweeps
-
-    def set_ir_proximity_readings(self):
-        """Get the proximity readings."""
-        ir_reading_l = self.irs[0].get_reading()
-        ir_reading_r = self.irs[1].get_reading()
-
-        self.readings['ir_l'] = ir_reading_l
-        self.readings['ir_r'] = ir_reading_r
-
-    def set_sonar_reading(self):
-        """Get the sonar reading. This happens slowly."""
-        sonar_reading = self.sonars[0].get_reading()
-        self.readings['s_m'] = int(sonar_reading)
-
-    def cleanup_gpio(self):
-        gpio.cleanup()
-
-    def get_all_readings(self):
-        return self.readings
-
-    def write_readings(self):
-        with open('readings.json', 'w') as f:
-            json.dump(self.readings, f)
-
-    def read_readings(self):
-        with open('readings.json') as f:
-            return json.load(f)
