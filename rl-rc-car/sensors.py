@@ -200,9 +200,13 @@ class Sensors:
             # Change the angle into an index.
             index = 0 if angle == 0 else int(angle / 6)
 
-            print(index)
             # Update the value at the index.
-            new_values[index] = distance
+            try:
+                new_values[index] = distance
+            except:
+                print("Invalid index:")
+                print(index)
+                raise
         else:
             print('Error reading from IR distance sensor. Received:')
             print(splitup)
