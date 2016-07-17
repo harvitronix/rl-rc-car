@@ -1,7 +1,6 @@
 import random
 import numpy as np
 from sim import sensors
-from collections import deque
 
 import pygame
 from pygame.color import THECOLORS
@@ -35,7 +34,7 @@ class GameState:
         self.space.gravity = pymunk.Vec2d(0., 0.)
 
         # Create the car.
-        self.create_car(100, 100, 0.5)
+        self.create_car(100, 100, -0.75)
         self.driving_direction = 0
 
         # Record steps.
@@ -63,7 +62,7 @@ class GameState:
             s.color = THECOLORS['red']
         self.space.add(static)
 
-        # Create some "walls".
+        # Create some inner "walls".
         self.create_circle_box(200, 125, 400, 400)
         self.create_circle_box(0, 525, 800, 650)
         self.create_circle_box(600, 300, 700, 550)
@@ -73,12 +72,8 @@ class GameState:
         # Create a cat.
         self.create_cat()
 
-        # Record multiple frames.
-        self.num_frames = 4
-        self.state_frames = deque()
-        # Initialize the frame queue.
-        for i in range(self.num_frames):
-            self.state_frames.append([1, 50, 50, 50, 1])
+        # Initialize our sensors.
+        self.sensor_obj = sensors.Sensors(width, height, screen, pygame, False)
 
     def create_circle_box(self, x1, y1, x2, y2):
         """
@@ -86,7 +81,7 @@ class GameState:
         for the life of me I can't figure out how to make a simple box!
         """
         # Defaults.
-        radius = 20
+        radius = 15
         gap = 0
 
         # Calculated values.
@@ -139,32 +134,17 @@ class GameState:
         if self.num_steps % 5 == 0:
             self.move_cat()
 
-        """
-        Actions are:
-        0: right, forward
-        1: left, forward
-        2: straight, forward
-        3: right, back
-        4: left, back
-        5: straight, back
-        """
-        # Forward or back.
-        if 0 <= action <= 2:
-            velocity_m = 50
-        else:
-            velocity_m = -50
-
         # Turning.
         turning = False
-        if action == 0 or action == 3:  # Turn right.
+        if action == 0:  # Turn right.
             self.car_body.angle -= .05
             turning = True
-        elif action == 1 or action == 4:  # Turn left.
+        elif action == 1:  # Turn left.
             self.car_body.angle += .05
             turning = True
 
         self.driving_direction = Vec2d(1, 0).rotated(self.car_body.angle)
-        self.car_body.velocity = velocity_m * self.driving_direction
+        self.car_body.velocity = 50 * self.driving_direction
 
         # Update the screen and stuff.
         screen.fill(THECOLORS["black"])
@@ -176,40 +156,48 @@ class GameState:
 
         # Get the current location and the readings there.
         x, y = self.car_body.position
-        sensor_obj = sensors.Sensors(x, y, self.car_body.angle, width, height,
-                                     screen, pygame)
-        sensor_obj.set_readings()
-        readings_arr = sensor_obj.get_readings()
+
+        # Set and get our sensor readings.
+        self.sensor_obj.set_readings(x, y, self.car_body.angle)
+
+        # Get readings.
+        proximity_sensors = self.sensor_obj.get_readings()
+
+        # The 3rd list item is the middle sonar.
+        forward_sonar = proximity_sensors[2]
+
+        # Now set the proximity sensors.
+        proximity_sensors = proximity_sensors[0:2]
+
+        # Get the sonar sweep reading.
+        sonar_sweep = self.sensor_obj.get_sonar_sweep_readings()
+
+        # State is sweep reading + middle sonar.
+        state = sonar_sweep + [forward_sonar]
 
         # Set the reward.
-        reward = self.get_reward(readings_arr, velocity_m, turning)
+        reward = self.get_reward(proximity_sensors, turning)
 
         # Show sensors.
         pygame.display.update()
 
-        # Add it to our frames deque.
-        # self.add_to_state_frames(readings_arr)
-
         # Numpy it.
-        state = np.array([readings_arr])
+        state = np.array([state])
 
         self.num_steps += 1
 
         return reward, state
 
-    def get_reward(self, readings, velocity, turning):
-        min_distance = 18
-
-        if readings[1] <= min_distance or readings[2] <= min_distance \
-                or readings[3] <= min_distance:
+    def get_reward(self, readings, turning):
+        if readings[0] == 0 or readings[1] == 0:
             # One of our front-facing sensors is very close to something.
             reward = -500
         elif turning:
             # Less reward if turning.
-            reward = 0
+            reward = 1
         else:
             # We're going straight.
-            reward = 1
+            reward = 2
 
         return reward
 
@@ -219,16 +207,11 @@ class GameState:
         direction = Vec2d(1, 0).rotated(self.cat_body.angle)
         self.cat_body.velocity = speed * direction
 
-    def add_to_state_frames(self, readings):
-        if len(self.state_frames) >= self.num_frames:
-            self.state_frames.popleft()
-        self.state_frames.append(readings)
-
     def recover(self):
         self.car_body.velocity = -100 * self.driving_direction
-        for i in range(3):
+        for i in range(4):
             self.car_body.angle += .2  # Turn a little.
-            screen.fill(THECOLORS["coral"])
+            screen.fill(THECOLORS["black"])
             draw(screen, self.space)
             self.space.step(1./10)
             if draw_screen:
