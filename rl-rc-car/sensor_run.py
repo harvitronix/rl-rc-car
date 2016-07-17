@@ -11,12 +11,13 @@ if __name__ == '__main__':
     sensors = Sensors(ir_pins, sonar_pins)
 
     while True:
-        # Send IR sweep readings on its own path. We do this so that it can
-        # read and update at every step, which happens much faster than our
-        # silly sonar sensor.
+        # Set all the readings.
         sensors.set_ir_sweep_reading()
         sensors.set_ir_proximity_readings()
         sensors.set_sonar_reading()
+
+        # Write the readings.
+        sensors.write_readings()
 
         # Just to see what's going on.
         print(sensors.get_all_readings())

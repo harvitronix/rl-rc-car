@@ -37,7 +37,7 @@ class SensorServer:
 
 
 if __name__ == '__main__':
-    input("Start sensors.py in the background then hit enter to start server.")
+    input("Start sensor_run.py then hit enter to start server.")
     ss = SensorServer()
     while 1:
         ss.serve_readings()
