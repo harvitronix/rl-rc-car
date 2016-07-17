@@ -49,7 +49,7 @@ for i in range(frames):
     terminal = False
     distance += 1
     action = pb.get_action(state)
-
+    print(state)
     # Let's see what the robocar sees.
     if visualize:
         # visualize_sensors(state)
