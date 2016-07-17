@@ -12,11 +12,13 @@ class RCCarServer:
         self.size = size
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.s.bind((socket.gethostname(), port))
-        # self.s.bind(('127.0.0.1', port))
+        # self.s.bind((socket.gethostname(), port))
+        self.s.bind(('127.0.0.1', port))
         self.s.listen(backlog)
 
         self.car = RCCar(apply_time=0.2, wait_time=0.4)
+
+        print("Ready.")
 
     def cleanup_gpio(self):
         self.car.cleanup_gpio()
