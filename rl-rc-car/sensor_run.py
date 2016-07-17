@@ -35,7 +35,7 @@ def do_ir_sweep(arduino_path):
 
     while True:
         print("Sweeping.")
-        new_sweeps = ir_sweep.get_ir_sweep_reading()
+        new_sweeps = ir_sweep.get_reading()
         new_sweeps_str = json.dumps(new_sweeps)
 
         # Write them...
