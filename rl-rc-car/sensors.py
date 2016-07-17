@@ -15,20 +15,27 @@ from statistics import median
 import serial
 import sys
 import json
+import threading
+
+# Setup the pi.
 gpio.setmode(gpio.BCM)
 
 
 class SonarSensor:
-    def __init__(self, in_p, out_p):
+    def __init__(self, in_p, out_p, max_iterations=1000,
+                 num_readings=5, max_distance=90):
         self.in_p = in_p
         self.out_p = out_p
         gpio.setup(self.out_p, gpio.OUT)
         gpio.setup(self.in_p, gpio.IN)
         gpio.output(self.out_p, False)
+        self.max_distance = max_distance
+        self.num_readings = num_readings
+        self.max_iterations = max_iterations
         print("Initialized a sonar sensor at %d (in) %d (out)" %
               (self.in_p, self.out_p))
 
-    def get_reading(self, num_readings=5, max_iterations=1000):
+    def get_reading(self):
         """
         Take multiple readings and return the median. Helps with highly
         variant and error-prone readings.
@@ -37,7 +44,7 @@ class SonarSensor:
 
         all_readings = []
 
-        for i in range(num_readings):
+        for i in range(self.num_readings):
             # Blip.
             gpio.output(self.out_p, True)
             time.sleep(0.00001)
@@ -51,19 +58,27 @@ class SonarSensor:
                 iterations += 1
 
             iterations = 0  # Reset so we can use it again.
-            while gpio.input(self.in_p) == 1 and iterations < max_iterations:
+            while gpio.input(self.in_p) == 1 and \
+                    iterations < self.max_iterations:
                 pulse_end = time.time()
                 iterations += 1
 
             if pulse_start is not None and pulse_end is not None:
                 # Turn time into distance.
                 pulse_duration = pulse_end - pulse_start
-                all_readings.append(pulse_duration * 17150)
+                distance = pulse_duration * 17150
+
+                # Limit distance returned.
+                distance = self.max_distance if \
+                    distance > self.max_distance else distance
+
+                # Add the measurement.
+                all_readings.append(distance)
 
         if len(all_readings) > 0:
             return median(all_readings)
         else:
-            return 90.
+            return self.max_distance
 
 
 class IRSensor:
@@ -136,26 +151,31 @@ class Sensors:
             'ir_s': [100 for x in range(31)],
         }
 
-    def set_all_readings(self):
+    def do_ir_loop(self):
+        """This will be called on a new thread."""
+        while True:
+            self.set_ir_sweep_reading()
+
+    def set_ir_sweep_reading(self):
+        """We put this in its own method so we can parallelize it."""
+        ir_distance_reading = self.ir_sweep.get_reading()
+
+        # Only update the IR readings if we got a good return value.
+        if ir_distance_reading is not None:
+            new_sweep = self.update_sweep(ir_distance_reading)
+            self.readings['ir_s'] = new_sweep
+
+    def set_other_readings(self):
         """
         This is specific to how we need the readings. Should be generalized.
         """
         ir_reading_l = self.irs[0].get_reading()
         ir_reading_r = self.irs[1].get_reading()
         sonar_reading = self.sonars[0].get_reading(10, 1000)
-        ir_distance_reading = self.ir_sweep.get_reading()
-
-        # Limit distance returned.
-        sonar_reading = 90 if sonar_reading > 90 else sonar_reading
 
         self.readings['ir_l'] = ir_reading_l
         self.readings['ir_r'] = ir_reading_r
         self.readings['s_m'] = int(sonar_reading)
-
-        # Only update the IR readings if we got a good return value.
-        if ir_distance_reading is not None:
-            new_sweep = self.update_sweep(ir_distance_reading)
-            self.readings['ir_s'] = new_sweep
 
     def cleanup_gpio(self):
         gpio.cleanup()
@@ -207,10 +227,18 @@ if __name__ == '__main__':
     sonar_pins = [[25, 8]]
 
     sensors = Sensors(ir_pins, sonar_pins)
+
+    # Send IR sweep readings on its own path. We do this so that it can
+    # read and update at every step, which happens much faster than our
+    # silly sonar sensor.
+    t = threading.Thread(target=sensors.do_ir_loop())
+    t.start()
+
+    # Set the rest of our readings and write out the file.
     while True:
         # Take readings and store them in a dict.
-        sensors.set_all_readings()
+        sensors.set_other_readings()
         # Write the dict to file.
         sensors.write_readings()
         # Print just so we can see.
-        print(sensors.read_readings())
+        print(sensors.get_all_readings())
