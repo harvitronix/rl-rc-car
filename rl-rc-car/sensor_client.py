@@ -48,7 +48,7 @@ if __name__ == '__main__':
         num_actions=actions, num_inputs=inputs,
         nodes_1=50, nodes_2=50, verbose=True,
         load_weights=True,
-        weights_file='saved-models/servo-9700.h5')
+        weights_file='saved-models/servo-332900.h5')
     pb = becho.ProjectBecho(
         network, num_actions=actions, num_inputs=inputs,
         verbose=True, enable_training=False)
