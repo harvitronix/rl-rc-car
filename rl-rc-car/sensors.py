@@ -15,7 +15,7 @@ from statistics import median
 import serial
 import sys
 import json
-import threading
+import thread
 
 # Setup the pi.
 gpio.setmode(gpio.BCM)
@@ -248,12 +248,13 @@ if __name__ == '__main__':
     # Send IR sweep readings on its own path. We do this so that it can
     # read and update at every step, which happens much faster than our
     # silly sonar sensor.
-    t = threading.Thread(target=sensors.do_ir_loop())
-    t.start()
+    thread.start_new_thread(sensors.do_ir_loop(), ())
 
     # Send other readings on their own path.
-    t2 = threading.Thread(target=sensors.do_other_loop())
-    t2.start()
+    thread.start_new_thread(sensors.do_other_loop(), ())
 
     # Just to see what's going on.
-    t3 = threading.Thread(target=sensors.read_loop())
+    thread.start_new_thread(sensors.read_loop(), ())
+
+    while True:
+        pass
