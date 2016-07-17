@@ -156,6 +156,11 @@ class Sensors:
         while True:
             self.set_ir_sweep_reading()
 
+    def do_other_loop(self):
+        """This will be called on a new thread."""
+        while True:
+            self.set_other_readings()
+
     def set_ir_sweep_reading(self):
         """We put this in its own method so we can parallelize it."""
         ir_distance_reading = self.ir_sweep.get_reading()
@@ -176,6 +181,9 @@ class Sensors:
         self.readings['ir_l'] = ir_reading_l
         self.readings['ir_r'] = ir_reading_r
         self.readings['s_m'] = int(sonar_reading)
+
+        # Write it out.
+        self.write_readings()
 
     def cleanup_gpio(self):
         gpio.cleanup()
@@ -224,6 +232,11 @@ class Sensors:
         with open('readings.json') as f:
             return json.load(f)
 
+    def read_loop(self):
+        while True:
+            print(self.get_all_readings())
+            time.sleep(0.1)
+
 
 if __name__ == '__main__':
     # Input pins.
@@ -238,12 +251,9 @@ if __name__ == '__main__':
     t = threading.Thread(target=sensors.do_ir_loop())
     t.start()
 
-    # Set the rest of our readings and write out the file.
-    while True:
-        print("Yes")
-        # Take readings and store them in a dict.
-        sensors.set_other_readings()
-        # Write the dict to file.
-        sensors.write_readings()
-        # Print just so we can see.
-        print(sensors.get_all_readings())
+    # Send other readings on their own path.
+    t2 = threading.Thread(target=sensors.do_other_loop())
+    t2.start()
+
+    # Just to see what's going on.
+    t3 = threading.Thread(target=sensors.read_loop())
