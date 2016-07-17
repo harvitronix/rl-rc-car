@@ -122,7 +122,8 @@ class IRSweep:
             self.readings = self.update_sweep(ir_distance_reading)
 
         # Return the readings even if we don't update it.
-        return self.readings
+        # We reverse them because 0 is on the right.
+        return self.readings.reverse()
 
     def update_sweep(self, reading):
         # Copy the old value.

@@ -7,6 +7,7 @@ from becho import becho, bechonet
 from sensor_client import SensorClient
 from rccar_client import RCCarClient
 import numpy as np
+from vis import visualize_polar
 
 
 if __name__ == '__main__':
@@ -50,11 +51,12 @@ if __name__ == '__main__':
         print("Getting action.")
         action = pb.get_action(state)
 
-        print(state, action)
+        print(state)
+        print("Taking action %d" % action)
+        visualize_polar(state)
         input("Press enter.")
 
         # Take action.
-        print("Taking action %d" % action)
         car.step(action)
 
         # Get new readings.
