@@ -21,8 +21,7 @@ def visualize_polar(state):
 
     ax = plt.subplot(111, polar=True)
 
-    # Orient the plot with north (0 degrees) to the top
-    ax.set_theta_zero_location('N')
+    ax.set_theta_zero_location('W')
     ax.set_ylim(bottom=0, top=105)
 
     plt.plot(r, t)
