@@ -17,6 +17,7 @@ class SensorServer:
         self.backlog = backlog
 
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.s.bind((host, port))
         self.s.listen(backlog)
 
