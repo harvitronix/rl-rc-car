@@ -4,7 +4,7 @@ This runs continuously and serves our sensor readings when requested.
 Base script from:
 http://ilab.cs.byu.edu/python/socket/echoserver.html
 """
-
+import redis
 import socket
 import json
 
@@ -20,20 +20,26 @@ class SensorServer:
         self.s.bind((host, port))
         self.s.listen(backlog)
 
+        self.r_server = redis.Redis('localhost')
+
     def serve_readings(self):
-        with open('readings.json') as f:
-            try:
-                data = json.load(f)
-            except:
-                print("Got bad JSON data from file. Not sending.")
-                return False
+        ir_s = self.r_server.get('ir_s')
+        ir_l = self.r_server.get('ir_l')
+        ir_r = self.r_server.get('ir_r')
+        ir_s = self.r_server.get('s_m')
+
+        readings = {
+            'ir_s': ir_s,
+            'ir_l': ir_l,
+            'ir_r': ir_r,
+            'ir_s': ir_s
+        }
 
         client, address = self.s.accept()
-        print("Sending: %s" % str(data))
-        b = json.dumps(data).encode('utf-8')
+        print("Sending: %s" % str(readings))
+        b = json.dumps(readings).encode('utf-8')
         client.sendall(b)
         client.close()
-        return True
 
 
 if __name__ == '__main__':
