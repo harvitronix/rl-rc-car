@@ -30,7 +30,7 @@ class SensorServer:
         s_m = json.loads(self.r_server.get('s_m').decode('utf-8'))
 
         ir_l = int(ir_l)
-        ir_s = int(ir_s)
+        ir_r = int(ir_r)
         ir_s = eval(ir_s)
 
         readings = {
