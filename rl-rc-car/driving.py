@@ -60,25 +60,19 @@ if __name__ == '__main__':
     input("Ready to roll! Press any key to go.")
 
     # Get initial state.
-    print("Getting readings")
     readings = sensors.get_readings()
-    print("Got readings:")
-    print(readings)
     state = np.array([readings['state']])
-    print("Made state:")
-    print(state)
 
     for i in range(500):
         # Get action.
-        print("getting action.")
+        print("Getting action.")
         action = pb.get_action(state)
-        print("Got action:")
-        print(action)
 
         print(state, action)
-        input("Press enter.")
+        # input("Press enter.")
 
         # Take action.
+        print("Taking action %d" % action)
         car.step(action)
 
         # Get new readings.
