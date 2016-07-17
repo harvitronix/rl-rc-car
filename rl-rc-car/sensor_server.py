@@ -34,7 +34,7 @@ class SensorServer:
             'ir_r': ir_r,
             's_m': s_m
         }
-
+        print(readings)
         client, address = self.s.accept()
         print("Sending: %s" % str(readings))
         b = json.dumps(readings).encode('utf-8')
