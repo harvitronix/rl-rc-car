@@ -21,7 +21,7 @@ def visualize_polar(state):
 
     ax = plt.subplot(111, polar=True)
 
-    ax.set_theta_zero_location('W')
+    ax.set_theta_zero_location('E')
     ax.set_ylim(bottom=0, top=105)
 
     plt.plot(r, t)

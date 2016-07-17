@@ -36,7 +36,13 @@ class SensorClient:
 
 
 if __name__ == '__main__':
-    # Testing it out.
+    # Basic test.
+    sensors = SensorClient(host='192.168.2.10')
+
+    while True:
+        print(sensors.get_readings())
+
+    # More advanced test.
     from becho import becho, bechonet
     import numpy as np
 

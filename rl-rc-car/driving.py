@@ -95,7 +95,8 @@ if __name__ == '__main__':
 
     car.cleanup_gpio()
 
-    # Save stuff.
-    with open('results/realcar-loss-log.csv', 'w') as myfile:
-        wr = csv.writer(myfile)
-        wr.writerows(network.loss_log)
+    if enable_training:
+        # Save stuff.
+        with open('results/realcar-loss-log.csv', 'w') as myfile:
+            wr = csv.writer(myfile)
+            wr.writerows(network.loss_log)
