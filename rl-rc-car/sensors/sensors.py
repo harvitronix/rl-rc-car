@@ -95,7 +95,7 @@ class IRDistance:
     """
     Read it from Arduino because it's analog.
     """
-    def __init__(self, path='', baud=9600):
+    def __init__(self, path, baud=9600):
         self.ser = serial.Serial(path, baud)
         print("Initialized an IR distance sensor at %s " % path)
 
@@ -109,11 +109,11 @@ class IRDistance:
 
 class IRSweep:
     """Use a servo to sweep and take readings."""
-    def __init__(self, path='', baud=9600):
+    def __init__(self, path, baud=9600):
         self.IRD = IRDistance(path, baud)
         self.readings = [100 for x in range(31)]
 
-    def set_ir_sweep_reading(self):
+    def get_reading(self):
         """Get IR reading."""
         ir_distance_reading = self.IRD.get_reading()
 
