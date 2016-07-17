@@ -121,6 +121,9 @@ class IRSweep:
         if ir_distance_reading is not None:
             self.readings = self.update_sweep(ir_distance_reading)
 
+        # Return the readings even if we don't update it.
+        return self.readings
+
     def update_sweep(self, reading):
         # Copy the old value.
         new_values = self.readings[:]
@@ -201,9 +204,7 @@ class Sensors:
     def set_ir_sweep_reading(self):
         """Get IR reading."""
         new_sweeps = self.ir_sweep.set_ir_sweep_reading()
-
-        if new_sweeps is not None:
-            self.readings['ir_s'] = new_sweeps
+        self.readings['ir_s'] = new_sweeps
 
     def set_ir_proximity_readings(self):
         """Get the proximity readings."""
