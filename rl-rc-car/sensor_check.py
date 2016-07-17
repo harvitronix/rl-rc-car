@@ -15,7 +15,8 @@ if __name__ == '__main__':
         # read and update at every step, which happens much faster than our
         # silly sonar sensor.
         sensors.set_ir_sweep_reading()
-        sensors.set_other_readings()
+        sensors.set_ir_proximity_readings()
+        sensors.set_sonar_reading()
 
         # Just to see what's going on.
         print(sensors.get_all_readings())
