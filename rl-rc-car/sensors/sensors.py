@@ -119,10 +119,7 @@ class IRSweep:
 
         # Only update the IR readings if we got a good return value.
         if ir_distance_reading is not None:
-            new_sweep = self.update_sweep(ir_distance_reading)
-            return new_sweep
-        else:
-            return None
+            self.readings = self.update_sweep(ir_distance_reading)
 
     def update_sweep(self, reading):
         # Copy the old value.
