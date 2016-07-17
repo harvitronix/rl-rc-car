@@ -70,6 +70,6 @@ if __name__ == '__main__':
     if args.sensor == 'sonar':
         do_sonar([25, 8])
     elif args.sensor == 'ir_sweep':
-        do_ir_sweep('/dev/ttyAMA0')
+        do_ir_sweep('/dev/ttyACM0')
     elif args.sensor == 'ir_prox':
         do_ir_prox([24, 21])
