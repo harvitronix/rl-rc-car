@@ -39,7 +39,7 @@ def do_ir_sweep(arduino_path):
         new_sweeps_str = json.dumps(new_sweeps)
 
         # Write them...
-        r_server.set('ir_s', new_sweeps_str)
+        # r_server.set('ir_s', new_sweeps_str)
 
         if verbose:
             print(new_sweeps)
