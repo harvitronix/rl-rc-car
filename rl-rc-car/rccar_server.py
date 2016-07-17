@@ -7,13 +7,13 @@ from rccar import RCCar
 
 
 class RCCarServer:
-    def __init__(self, port=8888, size=1024, backlog=5):
+    def __init__(self, host='', port=8888, size=1024, backlog=5):
         print("Setting up server.")
         self.size = size
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # self.s.bind((socket.gethostname(), port))
-        self.s.bind(('127.0.0.1', port))
+        self.s.bind((host, port))
         self.s.listen(backlog)
 
         self.car = RCCar(apply_time=0.2, wait_time=0.4)

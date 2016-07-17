@@ -28,5 +28,5 @@ class RCCarClient:
 
 if __name__ == '__main__':
     # For testing.
-    rccar_client = RCCarClient('192.168.2.9')
+    rccar_client = RCCarClient(host='192.168.2.9')
     rccar_client.step(2)
