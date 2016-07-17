@@ -23,9 +23,9 @@ class SensorServer:
         self.r_server = redis.Redis('localhost')
 
     def serve_readings(self):
-        ir_s = self.r_server.get('ir_s')
-        ir_l = self.r_server.get('ir_l')
-        ir_r = self.r_server.get('ir_r')
+        ir_s = self.r_server.get('ir_s').decode('utf-8')
+        ir_l = self.r_server.get('ir_l').decode('utf-8')
+        ir_r = self.r_server.get('ir_r').decode('utf-8')
         s_m = json.loads(self.r_server.get('s_m').decode('utf-8'))
 
         readings = {
