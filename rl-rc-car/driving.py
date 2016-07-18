@@ -74,6 +74,7 @@ if __name__ == '__main__':
         if min(state[0][10:20]) < 22:
             print('Proximity alert!')
             car.recover()
+            time.sleep(2)
 
         print("-"*80)
 
