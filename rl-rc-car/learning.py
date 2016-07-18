@@ -12,8 +12,8 @@ actions = 3
 
 # Just change these.
 train = False
-weights_file = 'saved-models/servo-1900.h5'
-visualize = False
+weights_file = 'saved-models/servo-4400.h5'
+visualize = True
 
 if train:
     enable_training = True

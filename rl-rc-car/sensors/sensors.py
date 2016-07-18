@@ -117,6 +117,9 @@ class IRSweep:
         """Get IR reading."""
         ir_distance_reading = self.IRD.get_reading()
 
+        # Multiply distance reading to more closely match training.
+        ir_distance_reading *= 2
+
         # Only update the IR readings if we got a good return value.
         if ir_distance_reading is not None:
             self.readings = self.update_sweep(ir_distance_reading)
