@@ -8,11 +8,12 @@ from sensor_client import SensorClient
 from rccar_client import RCCarClient
 import numpy as np
 from vis import visualize_polar
+import time
 
 
 if __name__ == '__main__':
     # Set defaults.
-    weights_file = 'saved-models/servo-4400.h5'
+    weights_file = 'saved-models/servo-10200.h5'
     inputs = 32
     actions = 3
     enable_training = True
@@ -54,10 +55,11 @@ if __name__ == '__main__':
         print(state)
         print("Taking action %d" % action)
         visualize_polar(state)
-        input("Press enter.")
+        # input("Press enter.")
 
         # Take action.
         car.step(action)
+        time.sleep(2)
 
         # Get new readings.
         new_readings = sensors.get_readings()
@@ -68,7 +70,8 @@ if __name__ == '__main__':
 
         # Make sure we aren't about to crash.
         # if new_readings['ir_r'] == 0 or new_readings['ir_l'] == 0:
-        if min(state) < 20:
+        print(state[0][10:20])
+        if min(state[0][10:20]) < 22:
             print('Proximity alert!')
             car.recover()
 

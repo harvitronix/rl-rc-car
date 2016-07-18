@@ -76,12 +76,13 @@ class RCCar:
         # Stop moving...
         GPIO.output(self.backward_p, 0)
         GPIO.output(self.forward_p, 0)
-        GPIO.output(self.left_p, 0)
-        GPIO.output(self.right_p, 0)
 
         # Wait.
         if self.wait_time > 0:
             time.sleep(self.wait_time)
+
+        GPIO.output(self.left_p, 0)
+        GPIO.output(self.right_p, 0)
 
     def recover(self):
         for i in range(4):
