@@ -119,9 +119,6 @@ class IRSweep:
 
         # Only update the IR readings if we got a good return value.
         if ir_distance_reading is not None:
-            # Multiply distance reading to more closely match training.
-            ir_distance_reading *= 2
-
             self.readings = self.update_sweep(ir_distance_reading)
 
         # Return the readings even if we don't update it.
@@ -142,6 +139,9 @@ class IRSweep:
             # Get the parts.
             angle = int(splitup[0])
             distance = int(splitup[1])
+
+            # Multiply distance reading to more closely match training.
+            ir_distance_reading *= 2
 
             # Limit distance returned.
             distance = 90 if distance > 90 else distance
