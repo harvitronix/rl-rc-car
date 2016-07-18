@@ -141,7 +141,7 @@ class IRSweep:
             distance = int(splitup[1])
 
             # Multiply distance reading to more closely match training.
-            ir_distance_reading *= 2
+            distance *= 2
 
             # Limit distance returned.
             distance = 90 if distance > 90 else distance
