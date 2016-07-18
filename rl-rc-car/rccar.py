@@ -83,4 +83,4 @@ class RCCar:
 
     def recover(self):
         for i in range(4):
-            self.step(4)
+            self.step(5)

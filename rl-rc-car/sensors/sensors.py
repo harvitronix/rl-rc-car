@@ -122,7 +122,7 @@ class IRSweep:
             self.readings = self.update_sweep(ir_distance_reading)
 
         # Return the readings even if we don't update it.
-        # We reverse them because 0 is on the right.
+        # We reverse them because 0-degrees is on the right.
         flipped = self.readings[:]
         return flipped[::-1]
 

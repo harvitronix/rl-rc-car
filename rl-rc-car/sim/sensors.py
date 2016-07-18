@@ -33,7 +33,7 @@ class Sensors:
         self.sweep_readings = []
         for i in range(31):
             # Get our angles.
-            self.sweep_offsets.append(-1.5 + i * 0.1)
+            self.sweep_offsets.append(1.5 - i * 0.1)
             # Set initial readings.
             self.sweep_readings.append(100)
 

@@ -12,7 +12,7 @@ from vis import visualize_polar
 
 if __name__ == '__main__':
     # Set defaults.
-    weights_file = 'saved-models/servo-332900.h5'
+    weights_file = 'saved-models/servo-4400.h5'
     inputs = 32
     actions = 3
     enable_training = True
