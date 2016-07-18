@@ -67,7 +67,8 @@ if __name__ == '__main__':
         state = new_state
 
         # Make sure we aren't about to crash.
-        if new_readings['ir_r'] == 0 or new_readings['ir_l'] == 0:
+        # if new_readings['ir_r'] == 0 or new_readings['ir_l'] == 0:
+        if min(state) < 20:
             print('Proximity alert!')
             car.recover()
 
