@@ -8,10 +8,11 @@ import time
 
 
 def get_area_means(ir_sweep):
-    left_m = mean(ir_sweep[0:12])
-    middle_m = mean(ir_sweep[13:17])
-    right_m = mean(ir_sweep[18:30])
-    return (left_m, middle_m, right_m)
+    area_means = []
+    mean_size = 6
+    for i in range(0, len(ir_sweep), mean_size):
+        area_means.append(mean(ir_sweep[i:i+mean_size]))
+    return area_means
 
 
 def get_max_area(means):
@@ -36,10 +37,11 @@ def get_action(ir_sweep):
     area_means = get_area_means(ir_sweep)
     print(area_means)
     max_area = get_max_area(area_means)
+    print(max_area)
 
-    if max_area == 0:
+    if max_area == 0 or max_area == 1:
         action = 1  # Turn left.
-    elif max_area == 2:
+    elif max_area == 4 or max_area == 5:
         action = 0  # Turn right.
     else:
         action = 2  # Go straight

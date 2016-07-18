@@ -12,8 +12,8 @@ actions = 3
 
 # Just change these.
 train = False
-weights_file = 'saved-models/servo-4400.h5'
-visualize = True
+weights_file = 'saved-models/servo-17900.h5'
+visualize = False
 
 if train:
     enable_training = True
@@ -41,7 +41,7 @@ rewards = []
 distances = []
 results = []
 distance = 0
-repeat_action = 3
+repeat_action = 1
 losses = []
 
 game_state = carmunk.GameState(noisey=False, map_style=map_style)
