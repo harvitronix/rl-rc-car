@@ -6,13 +6,13 @@ from statistics import mean
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-frames = 25000
+frames = 500000
 inputs = 32
 actions = 3
 
 # Just change these.
-train = False
-weights_file = 'saved-models/servo-17900.h5'
+train = True
+weights_file = 'saved-models/servo-nix.h5'
 visualize = False
 
 if train:
@@ -27,7 +27,7 @@ else:
     map_style = 'linear'
 
 network = bechonet.BechoNet(num_actions=actions, num_inputs=inputs,
-                            nodes_1=50, nodes_2=50, verbose=True,
+                            nodes_1=164, nodes_2=150, verbose=True,
                             load_weights=load_weights,
                             weights_file=weights_file,
                             save_weights=save_weights)

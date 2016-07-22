@@ -138,12 +138,12 @@ class Sensors:
                 return 1
 
     def make_sensor_arm(self, x, y):
-        spread = 4  # Default spread.
+        spread = 3  # Default spread.
         distance = 10  # Gap before first sensor.
         arm_points = []
         # Make an arm. We build it flat because we'll rotate it about the
         # center later.
-        for i in range(1, 100):
+        for i in range(1, 60):
             arm_points.append((distance + x + (spread * i), y))
 
         return arm_points
