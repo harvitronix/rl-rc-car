@@ -6,13 +6,13 @@ from statistics import mean
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-frames = 500000
+frames = 100000
 inputs = 32
 actions = 3
 
 # Just change these.
 train = True
-weights_file = 'saved-models/servo-nix.h5'
+weights_file = 'saved-models/nix-try.h5'
 visualize = False
 
 if train:

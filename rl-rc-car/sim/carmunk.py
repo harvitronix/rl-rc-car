@@ -20,8 +20,8 @@ clock = pygame.time.Clock()
 screen.set_alpha(None)
 
 # Showing sensors and redrawing slows things down.
-show_sensors = True
-draw_screen = True
+show_sensors = False
+draw_screen = False
 
 
 class GameState:
@@ -203,7 +203,8 @@ class GameState:
         reward = self.get_reward(proximity_sensors, turning)
 
         # Show sensors.
-        pygame.display.update()
+        if show_sensors:
+            pygame.display.update()
 
         # Numpy it.
         state = np.array([state])

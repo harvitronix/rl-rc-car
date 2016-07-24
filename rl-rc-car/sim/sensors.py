@@ -166,7 +166,7 @@ class Sensors:
 
     def set_sonar_sweep(self):
         # Do a number of steps for each frame.
-        for i in range(12):
+        for i in range(len(self.sweep_readings)):
             # Get the reading at the current offset.
             so = self.sweep_offsets[self.sweep_position]
             self.sweep_readings[self.sweep_position] = \
