@@ -33,7 +33,7 @@ class Sensors:
         self.sweep_readings = []
         for i in range(31):
             # Get our angles.
-            self.sweep_offsets.append(-1.5 + i * 0.1)
+            self.sweep_offsets.append(1.5 - i * 0.1)
             # Set initial readings.
             self.sweep_readings.append(100)
 
@@ -138,12 +138,12 @@ class Sensors:
                 return 1
 
     def make_sensor_arm(self, x, y):
-        spread = 4  # Default spread.
+        spread = 3  # Default spread.
         distance = 10  # Gap before first sensor.
         arm_points = []
         # Make an arm. We build it flat because we'll rotate it about the
         # center later.
-        for i in range(1, 100):
+        for i in range(1, 60):
             arm_points.append((distance + x + (spread * i), y))
 
         return arm_points
@@ -166,7 +166,7 @@ class Sensors:
 
     def set_sonar_sweep(self):
         # Do a number of steps for each frame.
-        for i in range(12):
+        for i in range(len(self.sweep_readings)):
             # Get the reading at the current offset.
             so = self.sweep_offsets[self.sweep_position]
             self.sweep_readings[self.sweep_position] = \

@@ -122,7 +122,9 @@ class IRSweep:
             self.readings = self.update_sweep(ir_distance_reading)
 
         # Return the readings even if we don't update it.
-        return self.readings
+        # We reverse them because 0-degrees is on the right.
+        flipped = self.readings[:]
+        return flipped[::-1]
 
     def update_sweep(self, reading):
         # Copy the old value.
@@ -137,6 +139,9 @@ class IRSweep:
             # Get the parts.
             angle = int(splitup[0])
             distance = int(splitup[1])
+
+            # Multiply distance reading to more closely match training.
+            distance *= 2
 
             # Limit distance returned.
             distance = 90 if distance > 90 else distance

@@ -25,7 +25,7 @@ draw_screen = True
 
 
 class GameState:
-    def __init__(self, noisey=False):
+    def __init__(self, noisey=False, map_style='default'):
         # Noisey sensors?
         self.noisey = noisey
 
@@ -39,6 +39,9 @@ class GameState:
 
         # Record steps.
         self.num_steps = 0
+
+        # Which map?
+        self.map_style = map_style
 
         # Create outer walls.
         static = [
@@ -62,6 +65,18 @@ class GameState:
             s.color = THECOLORS['red']
         self.space.add(static)
 
+        if map_style == 'default':
+            self.create_default_map()
+            # Create a cat.
+            self.create_cat()
+        elif map_style == 'linear':
+            # Used for testing a trained model mostly.
+            self.create_linear_map()
+
+        # Initialize our sensors.
+        self.sensor_obj = sensors.Sensors(width, height, screen, pygame, False)
+
+    def create_default_map(self):
         # Create some inner "walls".
         self.create_circle_box(200, 125, 400, 400)
         self.create_circle_box(0, 525, 800, 650)
@@ -69,11 +84,19 @@ class GameState:
         self.create_circle_box(550, 0, 1000, 150)
         self.create_circle_box(850, 275, 1075, 450)
 
-        # Create a cat.
-        self.create_cat()
+    def create_linear_map(self):
+        # Top wall.
+        self.create_circle_box(0, 300, 1200, 350)
 
-        # Initialize our sensors.
-        self.sensor_obj = sensors.Sensors(width, height, screen, pygame, False)
+        # A few obstacles.
+        self.create_obstacle(250, 150, 50)
+        self.create_obstacle(425, 50, 50)
+        # self.create_obstacle(600, 150, 50)
+        self.create_obstacle(1000, 50, 50)
+
+        # Obstacle walls.
+        self.create_circle_box(600, 20, 650, 200)
+        self.create_circle_box(800, 120, 850, 300)
 
     def create_circle_box(self, x1, y1, x2, y2):
         """
@@ -130,9 +153,10 @@ class GameState:
         self.space.add(self.car_body, self.car_shape)
 
     def frame_step(self, action):
-        # Move cat.
-        if self.num_steps % 5 == 0:
-            self.move_cat()
+        if self.map_style == 'default':
+            # Move cat.
+            if self.num_steps % 5 == 0:
+                self.move_cat()
 
         # Turning.
         turning = False
@@ -179,7 +203,8 @@ class GameState:
         reward = self.get_reward(proximity_sensors, turning)
 
         # Show sensors.
-        pygame.display.update()
+        if show_sensors:
+            pygame.display.update()
 
         # Numpy it.
         state = np.array([state])
@@ -217,6 +242,9 @@ class GameState:
             if draw_screen:
                 pygame.display.flip()
             clock.tick()
+
+    def get_car_coords(self):
+        return (self.car_body.position)
 
 
 if __name__ == "__main__":

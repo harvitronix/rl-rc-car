@@ -35,43 +35,16 @@ class SensorClient:
 
 
 if __name__ == '__main__':
-    # Basic test.
-    sensors = SensorClient(host='192.168.2.10')
-
-    while True:
-        print(sensors.get_readings())
-
-    # More advanced test.
-    from becho import becho, bechonet
+    # For testing.
     import numpy as np
-
-    inputs = 32
-    actions = 3
-
-    network = bechonet.BechoNet(
-        num_actions=actions, num_inputs=inputs,
-        nodes_1=50, nodes_2=50, verbose=True,
-        load_weights=True,
-        weights_file='saved-models/servo-332900.h5')
-    pb = becho.ProjectBecho(
-        network, num_actions=actions, num_inputs=inputs,
-        verbose=True, enable_training=False)
+    from vis import visualize_polar
     sensors = SensorClient(host='192.168.2.10')
 
     while True:
-        # Get the reading.
-        try:
-            readings = sensors.get_readings()
-            proximity = True if readings['ir_l'] == 0 or \
-                readings['ir_r'] == 0 else False
-            state = np.array([readings['state']])
+        readings = sensors.get_readings()
+        proximity = True if readings['ir_l'] == 0 or \
+            readings['ir_r'] == 0 else False
+        state = np.array([readings['state']])
 
-            # Visualize our distances.
-            visualize_polar(state)
-
-            # Get the action.
-            action = pb.get_action(state)
-            print("Doing action %d" % action)
-        except:
-            print("Error getting readings.")
-            raise
+        # Visualize our distances.
+        visualize_polar(state)
