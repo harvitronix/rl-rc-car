@@ -5,14 +5,15 @@ from vis import visualize_polar
 from statistics import mean
 import seaborn as sns
 import matplotlib.pyplot as plt
+import timeit
 
 frames = 100000
 inputs = 32
 actions = 3
 
 # Just change these.
-train = True
-weights_file = 'saved-models/nix-try.h5'
+train = False
+weights_file = 'saved-models/nix-try-99700.h5'
 visualize = False
 
 if train:
@@ -46,6 +47,9 @@ losses = []
 
 game_state = carmunk.GameState(noisey=False, map_style=map_style)
 _, state = game_state.frame_step((2))
+
+# Time it.
+start_time = timeit.default_timer()
 
 for i in range(frames):
     terminal = False
@@ -92,6 +96,11 @@ for i in range(frames):
             plt.plot(losses)
             sns.plt.draw()
             sns.plt.pause(0.05)
+
+            # Timing.
+            batch_time = timeit.default_timer() - start_time
+            print("Time per frame: %f" % (batch_time / 100))
+            start_time = timeit.default_timer()
 
         # Update the save filename so we can look at different points.
         new_ending = '-' + str(i) + '.h5'
