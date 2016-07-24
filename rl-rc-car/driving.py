@@ -13,7 +13,7 @@ import time
 
 if __name__ == '__main__':
     # Set defaults.
-    weights_file = 'saved-models/servo-10200.h5'
+    weights_file = 'saved-models/nix-try-99700.h5'
     inputs = 32
     actions = 3
     enable_training = True
